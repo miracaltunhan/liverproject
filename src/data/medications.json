@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "med1",
+      "name": "Metformin 500mg",
+      "dose": "1 tablet",
+      "time": "08:00",
+      "taken": false
+    },
+    {
+      "id": "med2",
+      "name": "Asetaminofen 500mg",
+      "dose": "1 tablet",
+      "time": "12:00",
+      "taken": false
+    },
+    {
+      "id": "med3",
+      "name": "Pantoprazol 40mg",
+      "dose": "1 tablet (aç karnına)",
+      "time": "07:00",
+      "taken": false
+    }
+  ]
+}

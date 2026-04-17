@@ -1,0 +1,73 @@
+{
+  "items": [
+    {
+      "id": "food1",
+      "name": "Su",
+      "category": "İçecek",
+      "allowed": true,
+      "reason": "Ameliyat gününden 2 saat öncesine kadar içilebilir.",
+      "timeRestriction": "Son 2 saat kısıtlı"
+    },
+    {
+      "id": "food2",
+      "name": "Çorba",
+      "category": "Sıvı Gıda",
+      "allowed": true,
+      "reason": "Hafif, ameliyat öncesi gece 6'ya kadar tüketilebilir."
+    },
+    {
+      "id": "food3",
+      "name": "Ekmek",
+      "category": "Karbonhidrat",
+      "allowed": false,
+      "reason": "Katı besinler gece yarısından itibaren yasak.",
+      "timeRestriction": "Gece yarısından sonra kesinlikle yasak"
+    },
+    {
+      "id": "food4",
+      "name": "Et",
+      "category": "Protein",
+      "allowed": false,
+      "reason": "Yağlı ve ağır protein ameliyat riski oluşturur.",
+      "timeRestriction": "24 saat öncesinden itibaren önerilmez"
+    },
+    {
+      "id": "food5",
+      "name": "Yoğurt",
+      "category": "Süt Ürünü",
+      "allowed": false,
+      "reason": "Süt ürünleri ameliyat öncesi yasaklanır.",
+      "timeRestriction": "Gece yarısından sonra yasak"
+    },
+    {
+      "id": "food6",
+      "name": "Meyve Suyu",
+      "category": "İçecek",
+      "allowed": true,
+      "reason": "Berrak meyve suyu gece 6'ya kadar izinlidir."
+    },
+    {
+      "id": "food7",
+      "name": "Kahve",
+      "category": "İçecek",
+      "allowed": false,
+      "reason": "Kafein tansiyon ve anestezi riskini artırır.",
+      "timeRestriction": "Ameliyat günü yasak"
+    },
+    {
+      "id": "food8",
+      "name": "Bisküvi",
+      "category": "Atıştırmalık",
+      "allowed": false,
+      "reason": "Katı gıda; gece yarısından sonra kesinlikle yasak.",
+      "timeRestriction": "Gece yarısından sonra yasak"
+    },
+    {
+      "id": "food9",
+      "name": "Hardal / Sos",
+      "category": "Baharat",
+      "allowed": false,
+      "reason": "Mide asidi ve anestezi komplikasyonu riski taşır."
+    }
+  ]
+}

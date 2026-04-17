@@ -1,0 +1,19 @@
+{
+  "items": [
+    {"id": "c1",  "label": "Kimlik / Nüfus Cüzdanı",    "critical": true},
+    {"id": "c2",  "label": "Sağlık Kartı / SGK Kartı",   "critical": true},
+    {"id": "c3",  "label": "Sevk / Randevu Belgesi",     "critical": true},
+    {"id": "c4",  "label": "Tahlil ve Görüntüleme Sonuçları", "critical": true},
+    {"id": "c5",  "label": "İlaçlar ve Reçeteler",       "critical": true},
+    {"id": "c6",  "label": "Pijama / Gecelik",           "critical": false},
+    {"id": "c7",  "label": "Terlik",                     "critical": false},
+    {"id": "c8",  "label": "Diş Fırçası & Macun",        "critical": false},
+    {"id": "c9",  "label": "Havlu",                      "critical": false},
+    {"id": "c10", "label": "Şarj Aleti",                 "critical": false},
+    {"id": "c11", "label": "Kitap / Tablet",             "critical": false},
+    {"id": "c12", "label": "Nakit Para",                 "critical": false},
+    {"id": "c13", "label": "Yedek Çamaşır (2 takım)",   "critical": false},
+    {"id": "c14", "label": "Kulaklık",                   "critical": false},
+    {"id": "c15", "label": "Küçük Su Şişesi",            "critical": false}
+  ]
+}

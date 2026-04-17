@@ -1,0 +1,128 @@
+import React, {createContext, useContext, useReducer, ReactNode} from 'react';
+
+// ─── State Types ────────────────────────────────────────────────────────────
+export interface MedicationEntry {
+  id: string;
+  name: string;
+  dose: string;
+  time: string; // "08:00"
+  taken: boolean;
+}
+
+export interface PatientState {
+  name: string;
+  surgeryType: string;
+  surgeryDate: string; // ISO string
+  medications: MedicationEntry[];
+  waterIntakeMl: number;        // günlük içilen su (ml)
+  waterGoalMl: number;          // hedef (ml)
+  bagChecklist: BagItem[];
+  lastSyncedAt: string | null;
+}
+
+export interface BagItem {
+  id: string;
+  label: string;
+  packed: boolean;
+  critical: boolean;
+}
+
+// ─── Actions ────────────────────────────────────────────────────────────────
+type Action =
+  | {type: 'SET_PATIENT'; payload: Partial<PatientState>}
+  | {type: 'MARK_MEDICATION_TAKEN'; payload: string}
+  | {type: 'ADD_WATER'; payload: number}
+  | {type: 'RESET_WATER'}
+  | {type: 'TOGGLE_BAG_ITEM'; payload: string}
+  | {type: 'ADD_BAG_ITEM'; payload: BagItem}
+  | {type: 'REMOVE_BAG_ITEM'; payload: string};
+
+// ─── Initial State ───────────────────────────────────────────────────────────
+const initialState: PatientState = {
+  name: '',
+  surgeryType: '',
+  surgeryDate: '',
+  medications: [],
+  waterIntakeMl: 0,
+  waterGoalMl: 2500,
+  bagChecklist: [],
+  lastSyncedAt: null,
+};
+
+// ─── Reducer ────────────────────────────────────────────────────────────────
+function patientReducer(state: PatientState, action: Action): PatientState {
+  switch (action.type) {
+    case 'SET_PATIENT':
+      return {...state, ...action.payload};
+
+    case 'MARK_MEDICATION_TAKEN':
+      return {
+        ...state,
+        medications: state.medications.map(m =>
+          m.id === action.payload ? {...m, taken: true} : m,
+        ),
+      };
+
+    case 'ADD_WATER':
+      return {
+        ...state,
+        waterIntakeMl: Math.min(
+          state.waterIntakeMl + action.payload,
+          state.waterGoalMl,
+        ),
+      };
+
+    case 'RESET_WATER':
+      return {...state, waterIntakeMl: 0};
+
+    case 'TOGGLE_BAG_ITEM':
+      return {
+        ...state,
+        bagChecklist: state.bagChecklist.map(item =>
+          item.id === action.payload
+            ? {...item, packed: !item.packed}
+            : item,
+        ),
+      };
+
+    case 'ADD_BAG_ITEM':
+      return {
+        ...state,
+        bagChecklist: [...state.bagChecklist, action.payload],
+      };
+
+    case 'REMOVE_BAG_ITEM':
+      return {
+        ...state,
+        bagChecklist: state.bagChecklist.filter(i => i.id !== action.payload),
+      };
+
+    default:
+      return state;
+  }
+}
+
+// ─── Context ────────────────────────────────────────────────────────────────
+interface PatientContextValue {
+  state: PatientState;
+  dispatch: React.Dispatch<Action>;
+}
+
+const PatientContext = createContext<PatientContextValue | undefined>(undefined);
+
+export const PatientProvider: React.FC<{children: ReactNode}> = ({children}) => {
+  const [state, dispatch] = useReducer(patientReducer, initialState);
+  return (
+    <PatientContext.Provider value={{state, dispatch}}>
+      {children}
+    </PatientContext.Provider>
+  );
+};
+
+export function usePatient(): PatientContextValue {
+  const ctx = useContext(PatientContext);
+  if (!ctx) {
+    throw new Error('usePatient must be used inside PatientProvider');
+  }
+  return ctx;
+}
