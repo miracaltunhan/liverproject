@@ -29,15 +29,10 @@ Hasta, ameliyat öncesi yapması gerekenleri hatırlamak veya doğru uygulamak i
 - Saat bazlı kısıtlar (örn: gece yarısından sonra aç kalma) ayrıca gösterilir
 
 ### 🧳 4. Hastane Çantası Checklist
-- AR ile oda ortamında eşya listesi holografik olarak süzer
+- AR ile oda ortamında eşya listesi holografik olarak süzülür
 - Hazırlanan eşyalar **yeşil** tik ile işaretlenir
-- Eksik veya unutan eşyalar **kırmızı** yanıp söner
+- Eksik veya unutulan eşyalar **kırmızı** yanıp söner
 - Liste kişiselleştirilebilir (isteğe göre eşya ekle/çıkar)
-
-### 📷 5. Gerçek Nesne Tanıma *(Bonus)*
-- Kamera aktif haldeyken oda nesneleri ML ile tanınır
-- Yanlış veya sakıncalı nesne tespit edilirse sesli + görsel uyarı verilir
-- Örnek: Çantaya yanlış koyulmuş bir nesne kırmızıya döner
 
 ---
 
@@ -46,9 +41,8 @@ Hasta, ameliyat öncesi yapması gerekenleri hatırlamak veya doğru uygulamak i
 | Katman | Teknoloji |
 |---|---|
 | Mobil Platform | iOS (ARKit) / Android (ARCore) |
-| Cross-platform Framework | Unity (AR Foundation) veya React Native + ViroReact |
+| Cross-platform Framework | Expo (React Native) + Viro Community |
 | 3D Modeller | GLTF / GLB formatı, Blender ile hazırlanmış |
-| Nesne Tanıma | TensorFlow Lite / Core ML (on-device) |
 | Backend (opsiyonel) | Firebase Realtime Database |
 | UI/UX | Figma prototip → uygulama içi AR overlay |
 
@@ -67,8 +61,7 @@ ameliyat-oncesi-ar/
 │   │   ├── MedicineAR.js         # İlaç kutusu AR modülü
 │   │   ├── WaterTrackerAR.js     # Su takip AR modülü
 │   │   ├── NutritionAR.js        # Beslenme rehberi AR modülü
-│   │   ├── BagChecklistAR.js     # Hastane çantası AR modülü
-│   │   └── ObjectRecognition.js  # Gerçek nesne tanıma modülü
+│   │   └── BagChecklistAR.js     # Hastane çantası AR modülü
 │   ├── components/       # Genel UI bileşenleri
 │   ├── screens/          # Ekran akışları
 │   ├── data/
@@ -107,14 +100,23 @@ cd ameliyat-oncesi-ar
 # Bağımlılıkları yükle
 npm install
 
-# Ortam değişkenlerini ayarla
-cp .env.example .env
+### 📱 iOS (Expo Go) Çalıştırma
+iOS cihazınızda uygulamayı test etmek için şu adımları izleyin:
 
-# iOS
-npx react-native run-ios
+1. **Expo Go Yükleyin**: App Store'dan "Expo Go" uygulamasını indirin.
+2. **Ağ Bağlantısı**: Bilgisayarınız ve iOS cihazınızın **aynı ağa** (aynı Wi-Fi veya aynı Hotspot) bağlı olduğundan emin olun.
+3. **Sunucuyu Başlatın**: Terminalde aşağıdaki komutu çalıştırın:
+   ```bash
+   EXPO_OFFLINE=1 npx expo start --go
+   ```
+4. **QR Kodu Okutun**: 
+   - Terminalde çıkan QR kodunu iPhone kamerasını kullanarak taratın.
+   - "Expo Go'da Aç" bildirimine tıklayın.
 
-# Android
-npx react-native run-android
+### Android
+```bash
+npx expo run:android
+```
 ```
 
 ---
@@ -125,7 +127,7 @@ npx react-native run-android
 Uygulama Açılır
      │
      ▼
-Ana Menü → [ İlaç | Su | Beslenme | Çanta | Nesne Tara ]
+Ana Menü → [ İlaç | Su | Beslenme | Çanta ]
      │
      ▼
 Kamera Açılır → Yüzey Algılanır → AR İçerik Yerleştirilir
@@ -175,7 +177,6 @@ AR Overlay  ←  ML Modeli (nesne tanıma)
 - [ ] Su takibi modülü (MVP)
 - [ ] Beslenme modülü
 - [ ] Hastane çantası checklist
-- [ ] ML nesne tanıma entegrasyonu
 - [ ] Doktor panosu (uzaktan takip)
 - [ ] Çoklu dil desteği (TR / EN / DE)
 - [ ] App Store & Google Play yayını

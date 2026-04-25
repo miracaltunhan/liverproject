@@ -4,11 +4,10 @@ export type RootStackParamList = {
   WaterTracker: undefined;
   Nutrition: undefined;
   BagChecklist: undefined;
-  ObjectScan: undefined;
   PatientProfile: undefined;
 };
 
 // AR ekran parametre tipleri
 export type ARScreenParams = {
-  moduleType: 'medicine' | 'water' | 'nutrition' | 'bag' | 'object';
+  moduleType: 'medicine' | 'water' | 'nutrition' | 'bag';
 };

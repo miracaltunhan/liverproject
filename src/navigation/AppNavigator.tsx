@@ -1,18 +1,17 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {StatusBar} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar } from 'react-native';
 import * as Linking from 'expo-linking';
 
-import {Colors} from '../theme';
-import {RootStackParamList} from './types';
+import { Colors } from '../theme';
+import { RootStackParamList } from './types';
 
 import HomeScreen from '../screens/HomeScreen';
 import MedicineScreen from '../screens/MedicineScreen';
 import WaterTrackerScreen from '../screens/WaterTrackerScreen';
 import NutritionScreen from '../screens/NutritionScreen';
 import BagChecklistScreen from '../screens/BagChecklistScreen';
-import ObjectScanScreen from '../screens/ObjectScanScreen';
 import PatientProfileScreen from '../screens/PatientProfileScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -26,7 +25,6 @@ const linking = {
       WaterTracker: 'water',
       Nutrition: 'nutrition',
       BagChecklist: 'bag',
-      ObjectScan: 'scan',
       PatientProfile: 'profile',
     },
   },
@@ -44,7 +42,7 @@ const AppNavigator: React.FC = () => {
         initialRouteName="Home"
         screenOptions={{
           headerShown: false,
-          cardStyle: {backgroundColor: Colors.bgPrimary},
+          cardStyle: { backgroundColor: Colors.bgPrimary },
           gestureEnabled: true,
           animationEnabled: true,
         }}>
@@ -52,27 +50,22 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Medicine"
           component={MedicineScreen}
-          options={{gestureEnabled: false}}
+          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="WaterTracker"
           component={WaterTrackerScreen}
-          options={{gestureEnabled: false}}
+          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="Nutrition"
           component={NutritionScreen}
-          options={{gestureEnabled: false}}
+          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="BagChecklist"
           component={BagChecklistScreen}
-          options={{gestureEnabled: false}}
-        />
-        <Stack.Screen
-          name="ObjectScan"
-          component={ObjectScanScreen}
-          options={{gestureEnabled: false}}
+          options={{ gestureEnabled: false }}
         />
         <Stack.Screen name="PatientProfile" component={PatientProfileScreen} />
       </Stack.Navigator>

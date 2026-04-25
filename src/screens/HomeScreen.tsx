@@ -46,14 +46,6 @@ const FEATURES = [
     subtitle: 'Eşya listeni AR hologramla kontrol et',
     color: Colors.warning,
   },
-  {
-    screen: 'ObjectScan' as keyof RootStackParamList,
-    icon: '📷',
-    title: 'Nesne Tarama',
-    subtitle: 'ML ile oda nesnelerini otomatik tanı',
-    color: Colors.danger,
-    badge: 'BONUS',
-  },
 ];
 
 const HomeScreen: React.FC = () => {
