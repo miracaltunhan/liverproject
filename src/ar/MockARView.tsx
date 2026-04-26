@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, ViewStyle, Animated, Easing} from 'react-native';
 import {CameraView, useCameraPermissions} from 'expo-camera';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Colors, Typography, Spacing, Radius} from '../theme';
@@ -33,6 +33,59 @@ const MockARView: React.FC<MockARViewProps> = ({
   const [permission, requestPermission] = useCameraPermissions();
   const insets = useSafeAreaInsets();
 
+  // ── Animasyon değerleri ─────────────────────────────────────────────────
+  const cornerPulse   = useRef(new Animated.Value(1)).current;
+  const trackingBlink = useRef(new Animated.Value(1)).current;
+  const sweepAnim     = useRef(new Animated.Value(0)).current;
+  const dotOpacity    = useRef(new Animated.Value(0.3)).current;
+  const [trackingLocked, setTrackingLocked] = useState(false);
+
+  useEffect(() => {
+    // Köşe braketleri pulse
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(cornerPulse, {toValue: 1.08, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true}),
+        Animated.timing(cornerPulse, {toValue: 1.0,  duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true}),
+      ]),
+    ).start();
+
+    // TRACKING yanıp sönme
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(trackingBlink, {toValue: 0.15, duration: 500, useNativeDriver: true}),
+        Animated.timing(trackingBlink, {toValue: 1.0,  duration: 500, useNativeDriver: true}),
+      ]),
+    ).start();
+
+    // Tam ekran yatay tarama süpürmesi
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(sweepAnim, {toValue: 1, duration: 3500, easing: Easing.linear, useNativeDriver: true}),
+        Animated.timing(sweepAnim, {toValue: 0, duration: 0, useNativeDriver: true}),
+        Animated.delay(1200),
+      ]),
+    ).start();
+
+    // Derinlik noktaları titreme
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(dotOpacity, {toValue: 0.7, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true}),
+        Animated.timing(dotOpacity, {toValue: 0.15, duration: 1200, easing: Easing.inOut(Easing.ease), useNativeDriver: true}),
+      ]),
+    ).start();
+
+    // 2.5s sonra "yüzey tespit edildi" kilitleme
+    const lockTimer = setTimeout(() => setTrackingLocked(true), 2500);
+    return () => clearTimeout(lockTimer);
+  }, []);
+
+  const sweepTranslateY = sweepAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-10, 800],
+  });
+
+  const cornerColor = trackingLocked ? Colors.arGreen ?? '#00E676' : Colors.arBlue;
+
   // ── İzin durumları ──────────────────────────────────────────────────────
   if (!permission) {
     return (
@@ -65,46 +118,94 @@ const MockARView: React.FC<MockARViewProps> = ({
     <View style={[styles.container, style]}>
       <CameraView style={StyleSheet.absoluteFill} facing="back" />
 
-      {/* Köşe tarama çerçevesi */}
+      {/* ── Tam ekran tarama süpürmesi ────────────────────────────────── */}
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.globalSweep, {transform: [{translateY: sweepTranslateY}]}]}
+      />
+
+      {/* ── Derinlik nokta ızgarası ───────────────────────────────────── */}
+      <Animated.View pointerEvents="none" style={[styles.depthGrid, {opacity: dotOpacity}]}>
+        {DEPTH_DOTS.map((d, i) => (
+          <View key={i} style={[styles.depthDot, {top: d.top, left: d.left, width: d.size, height: d.size, borderRadius: d.size}]} />
+        ))}
+      </Animated.View>
+
+      {/* ── Köşe tarama çerçevesi ─────────────────────────────────────── */}
       <View style={styles.scanFrameWrapper} pointerEvents="none">
-        <View style={styles.scanFrame}>
-          <View style={[styles.corner, styles.cornerTL]} />
-          <View style={[styles.corner, styles.cornerTR]} />
-          <View style={[styles.corner, styles.cornerBL]} />
-          <View style={[styles.corner, styles.cornerBR]} />
-        </View>
+        <Animated.View style={[styles.scanFrame, {transform: [{scale: cornerPulse}]}]}>
+          <View style={[styles.corner, styles.cornerTL, {borderColor: cornerColor}]} />
+          <View style={[styles.corner, styles.cornerTR, {borderColor: cornerColor}]} />
+          <View style={[styles.corner, styles.cornerBL, {borderColor: cornerColor}]} />
+          <View style={[styles.corner, styles.cornerBR, {borderColor: cornerColor}]} />
+          {/* Orta crosshair */}
+          <View style={styles.crossH} />
+          <View style={styles.crossV} />
+        </Animated.View>
       </View>
 
-      {/* Üst bilgi bandı */}
+      {/* ── Üst bilgi bandı ───────────────────────────────────────────── */}
       <View style={[styles.topBanner, {paddingTop: insets.top + Spacing.sm}]}>
-        <View style={styles.expoBadge}>
-          <Text style={styles.expoBadgeText}>📱 EXPO GO</Text>
+        <View style={styles.topRow}>
+          {/* Sol: Tracking durumu */}
+          <View style={styles.trackingBadge}>
+            <Animated.View style={[styles.trackingDot, {opacity: trackingBlink, backgroundColor: trackingLocked ? '#00E676' : '#FFD740'}]} />
+            <Text style={[styles.trackingText, {color: trackingLocked ? '#00E676' : '#FFD740'}]}>
+              {trackingLocked ? 'LOCKED' : 'TRACKING'}
+            </Text>
+          </View>
+          {/* Orta: Başlık */}
+          <Text style={styles.topTitle}>{moduleTitle}</Text>
+          {/* Sağ: AR etiketi */}
+          <View style={styles.arBadge}>
+            <Text style={styles.arBadgeText}>AR</Text>
+          </View>
         </View>
-        <Text style={styles.topTitle}>{moduleTitle}</Text>
-        <Text style={styles.topSubtitle}>AR Simülasyonu</Text>
+        <Text style={styles.topSubtitle}>Hologram Simülasyonu</Text>
       </View>
 
-      {/* Kapat butonu */}
+      {/* ── Sol kenar dikey veri çizgisi ──────────────────────────────── */}
+      <View style={styles.sideBar} pointerEvents="none">
+        <Text style={styles.sideBarText}>SYS:OK</Text>
+        <View style={styles.sideBarDivider} />
+        <Text style={styles.sideBarText}>DEPTH</Text>
+        <View style={styles.sideBarDivider} />
+        <Text style={styles.sideBarText}>PLANE</Text>
+        <View style={styles.sideBarDivider} />
+        <Text style={styles.sideBarText}>SENS</Text>
+      </View>
+
+      {/* ── Kapat butonu ──────────────────────────────────────────────── */}
       <TouchableOpacity style={[styles.closeBtn, {top: insets.top + Spacing.sm}]} onPress={onClose}>
         <Text style={styles.closeText}>✕</Text>
       </TouchableOpacity>
 
-      {/* Slot: ekran bazlı ek içerik (liste, progress vb.) */}
+      {/* ── Slot: şişe vb. içerik ─────────────────────────────────────── */}
       {children}
 
-      {/* Alt ipucu */}
+      {/* ── Alt HUD bandı ─────────────────────────────────────────────── */}
       <View style={[styles.hintBox, {paddingBottom: insets.bottom + Spacing.md}]}>
         <Text style={styles.hintText}>{hint}</Text>
-        <Text style={styles.hintNote}>
-          Tam AR deneyimi için EAS Dev Client ile build alın →{' '}
-          <Text style={styles.hintLink}>eas build --profile development</Text>
-        </Text>
       </View>
     </View>
   );
 };
 
-const CORNER_SIZE = 20;
+// Derinlik nokta verisi
+const DEPTH_DOTS: {top: string; left: string; size: number}[] = [
+  {top: '12%', left: '8%',  size: 3},
+  {top: '25%', left: '85%', size: 2},
+  {top: '38%', left: '15%', size: 2},
+  {top: '55%', left: '78%', size: 3},
+  {top: '68%', left: '5%',  size: 2},
+  {top: '72%', left: '90%', size: 2},
+  {top: '82%', left: '20%', size: 3},
+  {top: '15%', left: '55%', size: 2},
+  {top: '45%', left: '92%', size: 2},
+  {top: '30%', left: '42%', size: 2},
+];
+
+const CORNER_SIZE = 22;
 
 const styles = StyleSheet.create({
   container: {flex: 1, position: 'relative', backgroundColor: '#000'},
@@ -141,55 +242,150 @@ const styles = StyleSheet.create({
   skipBtn: {padding: Spacing.md},
   skipText: {...Typography.bodySmall, color: Colors.textSecondary},
 
-  // ── AR overlay ───────────────────────────────────────────────────────────
+  // ── Tam ekran tarama süpürmesi ───────────────────────────────────────────
+  globalSweep: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: 'rgba(64,196,255,0.18)',
+    shadowColor: '#40C4FF',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    zIndex: 5,
+  },
+
+  // ── Derinlik nokta ızgarası ──────────────────────────────────────────────
+  depthGrid: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+  },
+  depthDot: {
+    position: 'absolute',
+    backgroundColor: '#40C4FF',
+  },
+
+  // ── Köşe çerçeve ────────────────────────────────────────────────────────
   scanFrameWrapper: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 3,
   },
   scanFrame: {
-    width: 240,
-    height: 240,
+    width: 220,
+    height: 280,
     position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   corner: {
     position: 'absolute',
     width: CORNER_SIZE,
     height: CORNER_SIZE,
-    borderColor: Colors.arBlue,
     borderWidth: 2.5,
   },
   cornerTL: {top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 4},
   cornerTR: {top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0, borderTopRightRadius: 4},
   cornerBL: {bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0, borderBottomLeftRadius: 4},
   cornerBR: {bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0, borderBottomRightRadius: 4},
+  crossH: {
+    position: 'absolute',
+    width: 16,
+    height: 1,
+    backgroundColor: 'rgba(64,196,255,0.4)',
+  },
+  crossV: {
+    position: 'absolute',
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(64,196,255,0.4)',
+  },
 
+  // ── Üst banner ───────────────────────────────────────────────────────────
   topBanner: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(13,27,42,0.8)',
-    paddingVertical: Spacing.sm,
+    backgroundColor: 'rgba(7,15,25,0.75)',
+    paddingBottom: Spacing.sm,
     paddingHorizontal: Spacing.base,
     alignItems: 'center',
+    zIndex: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(64,196,255,0.2)',
   },
-  expoBadge: {
-    backgroundColor: Colors.brandBlue + 'AA',
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
-    borderRadius: Radius.round,
-    marginBottom: Spacing.xs,
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginBottom: 2,
   },
-  expoBadgeText: {
-    ...Typography.caption,
-    color: Colors.textOnBrand,
+  trackingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  trackingDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  trackingText: {
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
-  topTitle: {...Typography.headingSmall, color: Colors.textPrimary},
-  topSubtitle: {...Typography.caption, color: Colors.textSecondary, marginTop: 1},
+  topTitle: {
+    ...Typography.headingSmall,
+    color: Colors.textPrimary,
+    fontSize: 13,
+  },
+  arBadge: {
+    borderWidth: 1,
+    borderColor: Colors.arBlue,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  arBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.arBlue,
+    letterSpacing: 1.5,
+  },
+  topSubtitle: {
+    ...Typography.caption,
+    color: Colors.textDisabled,
+    letterSpacing: 0.5,
+  },
 
+  // ── Sol kenar veri çizgisi ───────────────────────────────────────────────
+  sideBar: {
+    position: 'absolute',
+    left: 10,
+    top: '35%',
+    gap: 6,
+    alignItems: 'center',
+    zIndex: 6,
+  },
+  sideBarText: {
+    fontSize: 7,
+    color: 'rgba(64,196,255,0.55)',
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    transform: [{rotate: '-90deg'}],
+  },
+  sideBarDivider: {
+    width: 1,
+    height: 12,
+    backgroundColor: 'rgba(64,196,255,0.2)',
+  },
+
+  // ── Kapat butonu ─────────────────────────────────────────────────────────
   closeBtn: {
     position: 'absolute',
     top: Spacing.md,
@@ -202,33 +398,27 @@ const styles = StyleSheet.create({
     borderColor: Colors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 20,
   },
   closeText: {color: '#fff', fontSize: 15, fontWeight: '700'},
 
+  // ── Alt HUD bandı ────────────────────────────────────────────────────────
   hintBox: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(13,27,42,0.85)',
+    backgroundColor: 'rgba(7,15,25,0.82)',
     paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(64,196,255,0.2)',
+    zIndex: 10,
   },
   hintText: {
     ...Typography.bodySmall,
     color: Colors.arBlue,
     textAlign: 'center',
-    marginBottom: Spacing.xs,
-  },
-  hintNote: {
-    ...Typography.caption,
-    color: Colors.textDisabled,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  hintLink: {
-    color: Colors.brandTeal,
-    fontWeight: '600',
   },
 });
 

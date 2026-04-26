@@ -24,6 +24,7 @@ export default {
         'android.permission.CAMERA',
         'android.permission.RECEIVE_BOOT_COMPLETED',
         'android.permission.SCHEDULE_EXACT_ALARM',
+        'android.permission.POST_NOTIFICATIONS',
       ],
     },
     plugins: [
@@ -37,17 +38,14 @@ export default {
       [
         'expo-notifications',
         {
-          icon: './assets/notification-icon.png',
-          color: '#1976D2',
+          color: '#40C4FF',
           sounds: [],
         },
       ],
       'expo-secure-store',
     ],
     extra: {
-      eas: {
-        projectId: 'your-eas-project-id',
-      },
+      eas: {},
     },
   },
 };

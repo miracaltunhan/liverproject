@@ -1,4 +1,5 @@
-import React, {createContext, useContext, useReducer, ReactNode} from 'react';
+import React, {createContext, useContext, useEffect, useReducer, useState, ReactNode} from 'react';
+import {loadPatientState, savePatientState} from '../utils/storage';
 
 // ─── State Types ────────────────────────────────────────────────────────────
 export interface MedicationEntry {
@@ -127,14 +128,35 @@ function patientReducer(state: PatientState, action: Action): PatientState {
 interface PatientContextValue {
   state: PatientState;
   dispatch: React.Dispatch<Action>;
+  isHydrated: boolean;
 }
 
 const PatientContext = createContext<PatientContextValue | undefined>(undefined);
 
 export const PatientProvider: React.FC<{children: ReactNode}> = ({children}) => {
   const [state, dispatch] = useReducer(patientReducer, initialState);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Uygulama açılışında kayıtlı veriyi yükle
+  useEffect(() => {
+    loadPatientState()
+      .then(saved => {
+        if (saved) {
+          dispatch({type: 'SET_PATIENT', payload: saved});
+        }
+      })
+      .catch(() => {/* depolama erişim hatası — varsayılan state kullan */})
+      .finally(() => setIsHydrated(true));
+  }, []);
+
+  // State her değiştiğinde kaydet (yükleme bitmeden kaydetme)
+  useEffect(() => {
+    if (!isHydrated) return;
+    savePatientState(state).catch(() => {/* sessiz hata */});
+  }, [state, isHydrated]);
+
   return (
-    <PatientContext.Provider value={{state, dispatch}}>
+    <PatientContext.Provider value={{state, dispatch, isHydrated}}>
       {children}
     </PatientContext.Provider>
   );
