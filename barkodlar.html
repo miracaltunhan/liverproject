@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karaciğer Nakli İlaçları — Barkodlar</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0D1B2A;
+      color: #F0F4F8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #40C4FF;
+    }
+    .subtitle {
+      text-align: center;
+      color: #90A4AE;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #162032;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      transition: transform 0.2s;
+      page-break-inside: avoid;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .icon { font-size: 24px; }
+    .med-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F0F4F8;
+    }
+    .generic-name {
+      font-size: 13px;
+      color: #90A4AE;
+      margin-bottom: 4px;
+    }
+    .category {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .barcode-container {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .barcode-container svg {
+      width: 100%;
+      height: auto;
+    }
+    .barcode-info {
+      font-size: 11px;
+      color: #546E7A;
+    }
+    .instructions {
+      max-width: 800px;
+      margin: 30px auto 0;
+      background: #1E2D42;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .instructions h3 {
+      color: #40C4FF;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .instructions ol {
+      color: #90A4AE;
+      padding-left: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .instructions li { margin-bottom: 4px; }
+    .instructions strong { color: #F0F4F8; }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 10px; }
+      .card { border: 1px solid #ccc; }
+      .med-name { color: #000; }
+      .generic-name { color: #555; }
+      .instructions { display: none; }
+      h1 { color: #1976D2; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💊 Karaciğer Nakli İlaçları — Barkodlar</h1>
+  <p class="subtitle">Bu barkodları uygulamanın AR tarayıcısıyla taratarak ilaç bilgilerini görüntüleyebilirsiniz</p>
+
+  <div class="grid" id="barcode-grid"></div>
+
+  <div class="instructions">
+    <h3>📱 Nasıl Kullanılır?</h3>
+    <ol>
+      <li>Uygulamayı açın → <strong>İlaç Rehberi</strong> → <strong>AR Tara</strong> butonuna basın</li>
+      <li>Bu sayfadaki barkodlardan birini telefonunuzun kamerasıyla taratın</li>
+      <li>İlaç otomatik tanınacak ve <strong>bilgi kartı</strong> ekranda açılacak</li>
+      <li>Bilgi kartındaki <strong>"Hatırlatıcı Oluştur"</strong> butonuyla günlük hatırlatma ayarlayın</li>
+    </ol>
+  </div>
+
+<script>
+const medicines = [
+  {
+    name: 'Prograf',
+    generic: 'Takrolimus',
+    icon: '💊',
+    category: 'İmmün Baskılayıcı',
+    color: '#1976D2',
+    barcodes: [
+      { code: '8699043890321', label: '0.5 mg 50 Kapsül' },
+      { code: '8699043890338', label: '1 mg 50 Kapsül' },
+    ]
+  },
+  {
+    name: 'CellCept',
+    generic: 'Mikofenolat Mofetil',
+    icon: '💊',
+    category: 'İmmün Baskılayıcı',
+    color: '#7B1FA2',
+    barcodes: [
+      { code: '8699505092768', label: '500 mg 50 Film Tablet' },
+    ]
+  },
+  {
+    name: 'Sandimmun Neoral',
+    generic: 'Siklosporin',
+    icon: '💊',
+    category: 'İmmün Baskılayıcı',
+    color: '#00838F',
+    barcodes: [
+      { code: '8699504190052', label: '100 mg 50 Kapsül' },
+    ]
+  },
+  {
+    name: 'Medrol / Prednol',
+    generic: 'Metilprednizolon',
+    icon: '💉',
+    category: 'Kortikosteroid',
+    color: '#E64A19',
+    barcodes: [
+      { code: '8681308779991', label: 'Depo-Medrol 40 mg Flakon' },
+    ]
+  },
+  {
+    name: 'Ursofalk',
+    generic: 'Ursodeoksikolik Asit',
+    icon: '🟢',
+    category: 'Safra Düzenleyici',
+    color: '#2E7D32',
+    barcodes: [
+      { code: '8699543150031', label: '250 mg 100 Kapsül' },
+    ]
+  },
+  {
+    name: 'Duphalac',
+    generic: 'Laktuloz',
+    icon: '🧴',
+    category: 'Laksatif',
+    color: '#F57C00',
+    barcodes: [
+      { code: '8699820570217', label: '667 mg/ml 300 ml Şurup' },
+    ]
+  },
+  {
+    name: 'Aldactone',
+    generic: 'Spironolakton',
+    icon: '💧',
+    category: 'Diüretik',
+    color: '#0277BD',
+    barcodes: [
+      { code: '8699543010021', label: '25 mg 20 Tablet' },
+    ]
+  },
+  {
+    name: 'Lasix',
+    generic: 'Furosemid',
+    icon: '💧',
+    category: 'Diüretik',
+    color: '#00ACC1',
+    barcodes: [
+      { code: '8699809014008', label: '40 mg 12 Tablet' },
+    ]
+  },
+  {
+    name: 'Nexium',
+    generic: 'Esomeprazol',
+    icon: '🛡️',
+    category: 'Mide Koruyucu',
+    color: '#6A1B9A',
+    barcodes: [
+      { code: '8699786040045', label: '40 mg 28 Pellet Tablet' },
+    ]
+  },
+  {
+    name: 'Bactrim',
+    generic: 'TMP-SMX',
+    icon: '🦠',
+    category: 'Antibiyotik',
+    color: '#C62828',
+    barcodes: [
+      { code: '8699525094636', label: '400/80 mg 30 Tablet' },
+    ]
+  },
+];
+
+const grid = document.getElementById('barcode-grid');
+
+medicines.forEach(med => {
+  med.barcodes.forEach(bc => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="icon">${med.icon}</span>
+        <span class="med-name">${med.name}</span>
+      </div>
+      <div class="generic-name">${med.generic}</div>
+      <span class="category" style="background:${med.color}33;color:${med.color}">${med.category}</span>
+      <div class="barcode-container">
+        <svg id="bc-${bc.code}"></svg>
+      </div>
+      <div class="barcode-info">${bc.label}</div>
+    `;
+    grid.appendChild(card);
+
+    // Barkod oluştur
+    setTimeout(() => {
+      JsBarcode(`#bc-${bc.code}`, bc.code, {
+        format: 'EAN13',
+        width: 2,
+        height: 70,
+        fontSize: 14,
+        margin: 5,
+        background: '#ffffff',
+        lineColor: '#000000',
+      });
+    }, 100);
+  });
+});
+</script>
+</body>
+</html>

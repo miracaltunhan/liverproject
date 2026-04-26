@@ -9,6 +9,7 @@ import { RootStackParamList } from './types';
 
 import HomeScreen from '../screens/HomeScreen';
 import MedicineScreen from '../screens/MedicineScreen';
+import MedicineDetailScreen from '../screens/MedicineDetailScreen';
 import WaterTrackerScreen from '../screens/WaterTrackerScreen';
 import NutritionScreen from '../screens/NutritionScreen';
 import BagChecklistScreen from '../screens/BagChecklistScreen';
@@ -22,6 +23,7 @@ const linking = {
     screens: {
       Home: '',
       Medicine: 'medicine',
+      MedicineDetail: 'medicine/:medicineId',
       WaterTracker: 'water',
       Nutrition: 'nutrition',
       BagChecklist: 'bag',
@@ -51,6 +53,10 @@ const AppNavigator: React.FC = () => {
           name="Medicine"
           component={MedicineScreen}
           options={{ gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="MedicineDetail"
+          component={MedicineDetailScreen}
         />
         <Stack.Screen
           name="WaterTracker"

@@ -1,117 +1,187 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 import {Colors, Typography, Spacing, Radius, Shadow} from '../theme';
 import Header from '../components/Header';
 import AROverlay from '../components/AROverlay';
 import MedicineAR from '../ar/MedicineAR';
-import {usePatient} from '../store/PatientContext';
+import {RootStackParamList} from '../navigation/types';
+import {MedicineInfo} from '../components/MedicineInfoCard';
+
+// ── İlaç verileri ─────────────────────────────────────────────────────────────
+import medicationsData from '../data/medications.json';
+const allMedicines: MedicineInfo[] = medicationsData.medicines as MedicineInfo[];
+
+// ── Kategorileri çıkar ────────────────────────────────────────────────────────
+const ALL_CATEGORIES = ['Tümü', ...new Set(allMedicines.map(m => m.category))];
+
+type NavProp = StackNavigationProp<RootStackParamList, 'Medicine'>;
 
 const MedicineScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const {state, dispatch} = usePatient();
+  const navigation = useNavigation<NavProp>();
   const [arActive, setArActive] = useState(false);
   const [alertMed, setAlertMed] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('Tümü');
 
-  const handleMarkTaken = (id: string, name: string) => {
-    Alert.alert(
-      'İlaç Alındı mı?',
-      `"${name}" ilacını aldığını onaylıyor musun?`,
-      [
-        {text: 'İptal', style: 'cancel'},
-        {
-          text: 'Evet, Aldım',
-          style: 'default',
-          onPress: () => dispatch({type: 'MARK_MEDICATION_TAKEN', payload: id}),
-        },
-      ],
-    );
-  };
+  // Kategoriye göre filtreleme
+  const filteredMedicines = useMemo(() => {
+    if (selectedCategory === 'Tümü') return allMedicines;
+    return allMedicines.filter(m => m.category === selectedCategory);
+  }, [selectedCategory]);
+
+  // Kategorilere göre gruplama
+  const groupedMedicines = useMemo(() => {
+    const groups: Record<string, MedicineInfo[]> = {};
+    filteredMedicines.forEach(med => {
+      if (!groups[med.category]) groups[med.category] = [];
+      groups[med.category].push(med);
+    });
+    return groups;
+  }, [filteredMedicines]);
 
   return (
     <View style={styles.screen}>
       <Header
         title="İlaç Rehberi"
-        subtitle="AR ile ilaç bilgisi"
+        subtitle="Karaciğer Nakli İlaçları"
         onBack={() => navigation.goBack()}
         rightAction={{icon: '📷', onPress: () => setArActive(v => !v)}}
       />
 
-      {/* AR Kamera Görünümü – tam ekran overlay */}
+      {/* ── AR Kamera Görünümü — tam ekran overlay ─────────────────────────── */}
       {arActive && (
         <View style={styles.arOverlay}>
           <MedicineAR
-            onMedicineDetected={name => setAlertMed(name)}
+            onMedicineDetected={id => {
+              // Kamera ekranını kapat
+              setArActive(false);
+              // İlaç detay sayfasına git ve otomatik hatırlatıcı sormasını sağla
+              navigation.navigate('MedicineDetail', {
+                medicineId: id,
+                autoPromptReminder: true,
+              });
+            }}
             onClose={() => setArActive(false)}
           />
-          {alertMed && (
-            <View style={styles.arAlertWrapper}>
-              <AROverlay
-                label={alertMed}
-                sublabel="Bu ilacı AR rehberle kullan"
-                type="info"
-                onDismiss={() => setAlertMed(null)}
-              />
-            </View>
-          )}
         </View>
       )}
 
-      {/* İlaç listesi */}
+      {/* ── Kategori Filtreleme ────────────────────────────────────────────── */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoryScroll}>
+        {ALL_CATEGORIES.map(category => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryChip,
+              selectedCategory === category && styles.categoryChipActive,
+            ]}
+            onPress={() => setSelectedCategory(category)}>
+            <Text
+              style={[
+                styles.categoryChipText,
+                selectedCategory === category && styles.categoryChipTextActive,
+              ]}>
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* ── İlaç listesi ───────────────────────────────────────────────────── */}
       <ScrollView
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}>
-        {state.medications.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>💊</Text>
-            <Text style={styles.emptyTitle}>İlaç Eklenmemiş</Text>
-            <Text style={styles.emptySubtitle}>
-              Profil ekranından ameliyat öncesi ilaçlarını ekle.
-            </Text>
-          </View>
-        ) : (
-          state.medications.map(med => (
-            <View
-              key={med.id}
-              style={[
-                styles.medCard,
-                med.taken && styles.medCardTaken,
-              ]}>
-              <View style={styles.medInfo}>
-                <Text style={styles.medName}>{med.name}</Text>
-                <Text style={styles.medDose}>{med.dose}</Text>
-                <View style={styles.medTimeRow}>
-                  <Text style={styles.medTimeIcon}>🕐</Text>
-                  <Text style={styles.medTime}>{med.time}</Text>
-                </View>
-              </View>
+        {Object.entries(groupedMedicines).map(([category, medicines]) => (
+          <View key={category}>
+            {/* Kategori başlığı (sadece "Tümü" seçiliyken göster) */}
+            {selectedCategory === 'Tümü' && (
+              <Text style={styles.groupTitle}>{category}</Text>
+            )}
 
-              {med.taken ? (
-                <View style={styles.takenBadge}>
-                  <Text style={styles.takenIcon}>✓</Text>
-                  <Text style={styles.takenText}>Alındı</Text>
+            {medicines.map(med => (
+              <TouchableOpacity
+                key={med.id}
+                style={styles.medCard}
+                activeOpacity={0.7}
+                onPress={() =>
+                  navigation.navigate('MedicineDetail', {medicineId: med.id})
+                }>
+                {/* Sol renkli bar */}
+                <View
+                  style={[styles.cardAccent, {backgroundColor: med.color}]}
+                />
+
+                <View style={styles.cardContent}>
+                  {/* Üst satır */}
+                  <View style={styles.cardTopRow}>
+                    <View
+                      style={[
+                        styles.cardIconWrapper,
+                        {backgroundColor: med.color + '22'},
+                      ]}>
+                      <Text style={styles.cardIcon}>{med.icon}</Text>
+                    </View>
+                    <View style={styles.cardTextBlock}>
+                      <Text style={styles.cardName}>{med.name}</Text>
+                      <Text style={styles.cardGeneric}>
+                        {med.genericName}
+                      </Text>
+                    </View>
+                    <Text style={[styles.cardArrow, {color: med.color}]}>
+                      ›
+                    </Text>
+                  </View>
+
+                  {/* Alt bilgi satırı */}
+                  <View style={styles.cardInfoRow}>
+                    <View style={styles.cardInfoItem}>
+                      <Text style={styles.cardInfoIcon}>🕐</Text>
+                      <Text style={styles.cardInfoText}>
+                        {med.frequency}
+                      </Text>
+                    </View>
+                    <View style={styles.cardInfoDot} />
+                    <View style={styles.cardInfoItem}>
+                      <Text style={styles.cardInfoIcon}>🍽️</Text>
+                      <Text style={styles.cardInfoText} numberOfLines={1}>
+                        {med.timing}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Kategori badge */}
+                  <View
+                    style={[
+                      styles.cardBadge,
+                      {backgroundColor: med.color + '1A'},
+                    ]}>
+                    <Text
+                      style={[styles.cardBadgeText, {color: med.color}]}>
+                      {med.category}
+                    </Text>
+                  </View>
                 </View>
-              ) : (
-                <TouchableOpacity
-                  style={styles.markBtn}
-                  onPress={() => handleMarkTaken(med.id, med.name)}>
-                  <Text style={styles.markBtnText}>Aldım</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ))
-        )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+
+        {/* Alt boşluk */}
+        <View style={{height: Spacing.xxxl + Spacing.xl}} />
       </ScrollView>
 
-      {/* AR başlatma FAB */}
+      {/* ── AR başlatma FAB ────────────────────────────────────────────────── */}
       {!arActive && (
         <TouchableOpacity
           style={styles.fab}
@@ -124,6 +194,7 @@ const MedicineScreen: React.FC = () => {
   );
 };
 
+// ── Stiller ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   screen: {flex: 1, backgroundColor: Colors.bgPrimary},
   arOverlay: {
@@ -137,82 +208,139 @@ const styles = StyleSheet.create({
     left: Spacing.base,
     right: Spacing.base,
   },
+
+  // ── Kategori Filtreleme ────────────────────────────────────────────────────
+  categoryScroll: {
+    paddingHorizontal: Spacing.base,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+  },
+  categoryChip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.round,
+    backgroundColor: Colors.bgSurface,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+  },
+  categoryChipActive: {
+    backgroundColor: Colors.brandBlue,
+    borderColor: Colors.brandBlue,
+  },
+  categoryChipText: {
+    ...Typography.labelSmall,
+    color: Colors.textSecondary,
+    textTransform: 'none',
+  },
+  categoryChipTextActive: {
+    color: Colors.textOnBrand,
+  },
+
+  // ── İlaç Listesi ───────────────────────────────────────────────────────────
   list: {
     padding: Spacing.base,
-    paddingBottom: Spacing.xxxl + Spacing.xl,
+    paddingTop: 0,
   },
+  groupTitle: {
+    ...Typography.headingSmall,
+    color: Colors.textSecondary,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+    paddingLeft: Spacing.xs,
+  },
+
+  // ── İlaç Kartı ─────────────────────────────────────────────────────────────
   medCard: {
     flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: Colors.bgSurface,
     borderRadius: Radius.lg,
-    padding: Spacing.base,
+    overflow: 'hidden',
     marginBottom: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.glassBorder,
     ...Shadow.low,
   },
-  medCardTaken: {
-    opacity: 0.5,
+  cardAccent: {
+    width: 4,
   },
-  medInfo: {flex: 1},
-  medName: {
+  cardContent: {
+    flex: 1,
+    padding: Spacing.md,
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIconWrapper: {
+    width: 42,
+    height: 42,
+    borderRadius: Radius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.md,
+  },
+  cardIcon: {
+    fontSize: 20,
+  },
+  cardTextBlock: {
+    flex: 1,
+  },
+  cardName: {
     ...Typography.headingSmall,
     color: Colors.textPrimary,
   },
-  medDose: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  medTimeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: Spacing.xs,
-  },
-  medTimeIcon: {fontSize: 12, marginRight: 4},
-  medTime: {
+  cardGeneric: {
     ...Typography.caption,
-    color: Colors.brandBlue,
+    color: Colors.textSecondary,
+    marginTop: 1,
   },
-  takenBadge: {
+  cardArrow: {
+    fontSize: 24,
+    fontWeight: '300',
+  },
+
+  // ── Bilgi Satırı ───────────────────────────────────────────────────────────
+  cardInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.successLight,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: Radius.round,
+    marginTop: Spacing.sm,
+    paddingLeft: Spacing.xs,
   },
-  takenIcon: {color: Colors.arGreen, fontWeight: '700', marginRight: 4},
-  takenText: {
-    ...Typography.labelLarge,
-    color: Colors.arGreen,
-  },
-  markBtn: {
-    backgroundColor: Colors.brandBlue,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radius.round,
-  },
-  markBtnText: {
-    ...Typography.labelLarge,
-    color: Colors.textOnBrand,
-  },
-  emptyState: {
+  cardInfoItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: Spacing.xxxl,
   },
-  emptyIcon: {fontSize: 56, marginBottom: Spacing.md},
-  emptyTitle: {
-    ...Typography.headingMedium,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.sm,
+  cardInfoIcon: {
+    fontSize: 11,
+    marginRight: 4,
   },
-  emptySubtitle: {
-    ...Typography.bodyMedium,
+  cardInfoText: {
+    ...Typography.caption,
     color: Colors.textSecondary,
-    textAlign: 'center',
   },
+  cardInfoDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.textDisabled,
+    marginHorizontal: Spacing.sm,
+  },
+
+  // ── Badge ──────────────────────────────────────────────────────────────────
+  cardBadge: {
+    alignSelf: 'flex-start',
+    marginTop: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: Radius.round,
+  },
+  cardBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+
+  // ── FAB ────────────────────────────────────────────────────────────────────
   fab: {
     position: 'absolute',
     bottom: Spacing.xl,

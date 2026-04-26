@@ -1,25 +1,339 @@
 {
-  "items": [
+  "medicines": [
     {
-      "id": "med1",
-      "name": "Metformin 500mg",
-      "dose": "1 tablet",
-      "time": "08:00",
-      "taken": false
+      "id": "prograf",
+      "name": "Prograf",
+      "genericName": "Takrolimus",
+      "category": "İmmün Baskılayıcı",
+      "icon": "💊",
+      "purpose": "Organ naklinden sonra vücudun yeni karaciğeri reddetmesini önler. Bağışıklık sistemini baskılayarak nakledilen organın kabul edilmesini sağlar.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 2 kez, 12 saat arayla alınır.",
+      "frequency": "Günde 2 kez",
+      "timing": "Aç karnına (yemeklerden 1 saat önce veya 2 saat sonra)",
+      "howToTake": "Kapsülü bütün olarak bir bardak su ile yutun. Çiğnemeyin, ezmeyin veya açmayın. Her gün aynı saatte alın.",
+      "warnings": [
+        "Greyfurt ve greyfurt suyu ile birlikte almayın",
+        "Kan düzeyiniz düzenli olarak kontrol edilmelidir",
+        "Güneşten korunun — cilt kanseri riski artabilir",
+        "Enfeksiyon belirtilerini hemen bildirin (ateş, öksürük)",
+        "Hamilelik döneminde kullanımı kontrendikedir"
+      ],
+      "sideEffects": [
+        "Titreme (tremor)",
+        "Baş ağrısı",
+        "İshal",
+        "Bulantı",
+        "Böbrek fonksiyon bozukluğu",
+        "Kan şekeri yükselmesi",
+        "Tansiyon yükselmesi"
+      ],
+      "interactions": [
+        "Siklosporin ile birlikte kullanılmamalıdır",
+        "Ketokonazol, itrakonazol gibi antifungaller etki artışına neden olur",
+        "Rifampisin etki azalmasına neden olur"
+      ],
+      "color": "#1976D2",
+      "imageTargetName": "prograf_box"
     },
     {
-      "id": "med2",
-      "name": "Asetaminofen 500mg",
-      "dose": "1 tablet",
-      "time": "12:00",
-      "taken": false
+      "id": "cellcept",
+      "name": "CellCept",
+      "genericName": "Mikofenolat Mofetil",
+      "category": "İmmün Baskılayıcı",
+      "icon": "💊",
+      "purpose": "Organ nakli sonrası rejeksiyon (red) reaksiyonunu önlemek için kullanılır. Bağışıklık hücrelerinin çoğalmasını engeller.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 2 kez, 12 saat arayla alınır.",
+      "frequency": "Günde 2 kez",
+      "timing": "Aç karnına (yemeklerden 1 saat önce veya 2 saat sonra)",
+      "howToTake": "Kapsül/tableti bütün olarak su ile yutun. Kapsülleri açmayın, tabletleri kırmayın. Toz halini solumayın veya cildinize temas ettirmeyin.",
+      "warnings": [
+        "Hamilelik döneminde kesinlikle kullanılmamalıdır — doğum defektlerine neden olabilir",
+        "Canlı aşılardan kaçının",
+        "Enfeksiyon riski artmıştır — kalabalık ortamlardan kaçının",
+        "Antiasitler emilimi azaltabilir — 2 saat ara bırakın",
+        "Düzenli kan sayımı gereklidir"
+      ],
+      "sideEffects": [
+        "İshal",
+        "Bulantı ve kusma",
+        "Karın ağrısı",
+        "Kansızlık (anemi)",
+        "Beyaz kan hücresi düşüklüğü (lökopeni)",
+        "Enfeksiyona yatkınlık"
+      ],
+      "interactions": [
+        "Antiasitler (alüminyum, magnezyum) emilimi azaltır",
+        "Asiklovir ile birlikte böbrek yükü artabilir",
+        "Kolestiramin emilimi engeller"
+      ],
+      "color": "#7B1FA2",
+      "imageTargetName": "cellcept_box"
     },
     {
-      "id": "med3",
-      "name": "Pantoprazol 40mg",
-      "dose": "1 tablet (aç karnına)",
-      "time": "07:00",
-      "taken": false
+      "id": "sandimmun",
+      "name": "Sandimmun Neoral",
+      "genericName": "Siklosporin",
+      "category": "İmmün Baskılayıcı",
+      "icon": "💊",
+      "purpose": "Organ naklinden sonra bağışıklık sistemini baskılayarak yeni karaciğerin reddedilmesini önler. T-lenfosit aktivasyonunu engeller.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 2 kez, 12 saat arayla alınır.",
+      "frequency": "Günde 2 kez",
+      "timing": "Her gün aynı saatte, tercihen yemeklerle birlikte",
+      "howToTake": "Kapsülü bütün olarak su ile yutun. Oral solüsyon kullanıyorsanız, portakal suyu veya elma suyu ile karıştırabilirsiniz. Metal kap kullanmayın.",
+      "warnings": [
+        "Greyfurt ve greyfurt suyu ile birlikte almayın",
+        "Kan basıncınızı düzenli kontrol ettirin",
+        "Böbrek fonksiyonlarınız izlenmelidir",
+        "Takrolimus ile aynı anda kullanılmamalıdır",
+        "Aşırı güneş ışığından kaçının"
+      ],
+      "sideEffects": [
+        "Böbrek fonksiyon bozukluğu",
+        "Tansiyon yükselmesi",
+        "Titreme (tremor)",
+        "Baş ağrısı",
+        "Diş eti büyümesi",
+        "Aşırı kıllanma",
+        "Kolesterol yükselmesi"
+      ],
+      "interactions": [
+        "Takrolimus ile birlikte kullanılmamalıdır",
+        "NSAİİ ilaçlar (ibuprofen) böbrek hasarı riskini artırır",
+        "Statin grubu ilaçlarla kas hasarı riski artar"
+      ],
+      "color": "#00838F",
+      "imageTargetName": "sandimmun_box"
+    },
+    {
+      "id": "medrol",
+      "name": "Medrol / Prednol",
+      "genericName": "Metilprednizolon",
+      "category": "Anti-inflamatuar / Kortikosteroid",
+      "icon": "💉",
+      "purpose": "Güçlü anti-inflamatuar ve immün baskılayıcı etkisiyle organ reddi reaksiyonunu önler. Nakil sonrası ilk dönemde yüksek dozda, zamanla azaltılarak kullanılır.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Doz zamanla kademeli olarak azaltılır. Kendi başınıza dozu değiştirmeyin.",
+      "frequency": "Genellikle günde 1 kez",
+      "timing": "Sabah kahvaltıdan sonra (tok karnına)",
+      "howToTake": "Tableti bir bardak su ile yutun. Tok karnına almanız mide tahrişini azaltır. İlacı aniden bırakmayın — doktorunuz dozu kademeli azaltacaktır.",
+      "warnings": [
+        "İlacı aniden kesmeyin — ciddi yan etkilere yol açabilir (adrenal kriz)",
+        "Şeker hastası iseniz kan şekerinizi sık kontrol edin",
+        "Enfeksiyon belirtilerini maskeleyebilir",
+        "Uzun süreli kullanımda kemik erimesi riski vardır",
+        "Canlı aşılardan kaçının"
+      ],
+      "sideEffects": [
+        "Kilo artışı ve yüzde şişlik (ay yüzü)",
+        "Kan şekeri yükselmesi",
+        "Kemik erimesi (osteoporoz)",
+        "Mide tahrişi",
+        "Uyku bozuklukları",
+        "Ruh hali değişiklikleri",
+        "Yara iyileşmesinde gecikme"
+      ],
+      "interactions": [
+        "NSAİİ ilaçlar mide kanaması riskini artırır",
+        "Diyabet ilaçlarının etkisini azaltabilir",
+        "Antikoagülanların etkisini değiştirebilir"
+      ],
+      "color": "#E64A19",
+      "imageTargetName": "medrol_box"
+    },
+    {
+      "id": "ursofalk",
+      "name": "Ursofalk",
+      "genericName": "Ursodeoksikolik Asit (UDKA)",
+      "category": "Safra Asidi Düzenleyici",
+      "icon": "🟢",
+      "purpose": "Safra akışını düzenler ve safra taşlarının oluşumunu önler. Karaciğer nakli sonrası safra yollarının sağlıklı çalışmasını destekler.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 2-3 kez alınır.",
+      "frequency": "Günde 2-3 kez",
+      "timing": "Yemeklerle birlikte (tok karnına)",
+      "howToTake": "Kapsülü bir bardak su ile yutun. Kapsülü çiğnemeyin veya açmayın. Süspansiyon kullanıyorsanız kullanmadan önce iyice çalkalayın.",
+      "warnings": [
+        "Safra yolu tıkanıklığı varsa kullanılmamalıdır",
+        "Antiasitler emilimi azaltabilir — 2 saat ara bırakın",
+        "Karaciğer fonksiyon testleri düzenli yapılmalıdır",
+        "İshal şiddetli olursa doktorunuza bildirin"
+      ],
+      "sideEffects": [
+        "İshal (yumuşak dışkı)",
+        "Karın ağrısı",
+        "Bulantı",
+        "Kaşıntı (nadir)"
+      ],
+      "interactions": [
+        "Kolestiramin ve kolestipol emilimi engeller — 2 saat ara bırakın",
+        "Alüminyum içeren antiasitler emilimi azaltır",
+        "Siklosporin emilimini artırabilir — doz ayarı gerekebilir"
+      ],
+      "color": "#2E7D32",
+      "imageTargetName": "ursofalk_box"
+    },
+    {
+      "id": "duphalac",
+      "name": "Duphalac",
+      "genericName": "Laktuloz",
+      "category": "Laksatif / Ensefalopati Önleyici",
+      "icon": "🧴",
+      "purpose": "Hepatik ensefalopatinin (karaciğer kaynaklı bilinç bulanıklığı) önlenmesi ve tedavisi için kullanılır. Bağırsaklardan amonyak atılımını artırarak beyin fonksiyonlarını korur.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 2-3 kez, 15-30 ml alınır.",
+      "frequency": "Günde 2-3 kez",
+      "timing": "Yemeklerle birlikte veya ayrı alınabilir",
+      "howToTake": "Şurubu ölçek ile doğru dozda alın. Su veya meyve suyu ile karıştırabilirsiniz. Düzenli bağırsak hareketi sağlamak için yeterli su için.",
+      "warnings": [
+        "Galaktoz intoleransı varsa kullanılmamalıdır",
+        "Diyabet hastaları şeker içeriğine dikkat etmelidir",
+        "Uzun süreli ishal durumunda elektrolit kontrolü gerekir",
+        "Günde 2-3 yumuşak dışkı hedeflenir — aşırı ishal olursa dozu azaltın"
+      ],
+      "sideEffects": [
+        "Şişkinlik ve gaz",
+        "Karın krampları",
+        "Bulantı (özellikle başlangıçta)",
+        "İshal (doz fazla ise)"
+      ],
+      "interactions": [
+        "Antibiyotikler (neomisin) etkinliği azaltabilir",
+        "Laksatif kullanımı elektrolit dengesini bozabilir",
+        "Antiasitler etkiyi azaltabilir"
+      ],
+      "color": "#F57C00",
+      "imageTargetName": "duphalac_box"
+    },
+    {
+      "id": "aldactone",
+      "name": "Aldactone",
+      "genericName": "Spironolakton",
+      "category": "Diüretik (İdrar Söktürücü)",
+      "icon": "💧",
+      "purpose": "Karın bölgesinde biriken sıvıyı (asit) azaltmak ve vücuttaki ödem (şişlik) tedavisi için kullanılır. Potasyum tutucu bir diüretiktir.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 1-2 kez alınır.",
+      "frequency": "Günde 1-2 kez",
+      "timing": "Sabah kahvaltıyla birlikte (tok karnına). Gece almaktan kaçının — sık idrara çıkma uyku düzenini bozabilir.",
+      "howToTake": "Tableti bir bardak su ile yutun. Tok karnına almanız mide tahrişini azaltır ve emilimi artırır.",
+      "warnings": [
+        "Potasyum açısından zengin gıdaları (muz, portakal, kuru yemiş) aşırı tüketmeyin",
+        "Potasyum takviyesi almayın (doktor önerisi olmadan)",
+        "Böbrek fonksiyonları ve potasyum düzeyi düzenli kontrol edilmelidir",
+        "Baş dönmesi yapabilir — pozisyon değişikliklerinde dikkatli olun"
+      ],
+      "sideEffects": [
+        "Sık idrara çıkma",
+        "Baş dönmesi",
+        "Bulantı",
+        "Potasyum yükselmesi (hiperpotasemi)",
+        "Erkeklerde göğüs büyümesi (jinekomasti)",
+        "Adet düzensizliği"
+      ],
+      "interactions": [
+        "ACE inhibitörleri ve ARB'ler potasyum yükselmesi riskini artırır",
+        "NSAİİ ilaçlar diüretik etkiyi azaltabilir",
+        "Lityum düzeyini artırabilir"
+      ],
+      "color": "#0277BD",
+      "imageTargetName": "aldactone_box"
+    },
+    {
+      "id": "lasix",
+      "name": "Lasix",
+      "genericName": "Furosemid",
+      "category": "Diüretik (İdrar Söktürücü)",
+      "icon": "💧",
+      "purpose": "Vücuttaki fazla sıvıyı atmak için kullanılır. Ödem (şişlik) ve asit (karın sıvısı) tedavisinde etkilidir. Genellikle Aldactone ile birlikte kullanılır.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle sabah tek doz alınır.",
+      "frequency": "Genellikle günde 1 kez",
+      "timing": "Sabah (tok karnına). Öğleden sonra veya akşam almaktan kaçının — gece sık idrara çıkmanıza neden olur.",
+      "howToTake": "Tableti bir bardak su ile yutun. Günlük su ve tuz alımı konusunda doktorunuzun önerilerine uyun.",
+      "warnings": [
+        "Dehidratasyon (susuzluk) belirtilerine dikkat edin",
+        "Tansiyon düşmesi ve baş dönmesi yapabilir — yavaş kalkın",
+        "Potasyum, sodyum ve magnezyum düzeyleri kontrol edilmelidir",
+        "İşitme kaybına neden olabilir (yüksek dozlarda)"
+      ],
+      "sideEffects": [
+        "Sık idrara çıkma",
+        "Susuzluk ve ağız kuruluğu",
+        "Baş dönmesi ve tansiyon düşmesi",
+        "Potasyum düşüklüğü (hipopotasemi)",
+        "Kas krampları",
+        "Kulak çınlaması (yüksek dozlarda)"
+      ],
+      "interactions": [
+        "Aminoglikozid antibiyotikler (gentamisin) işitme kaybı riskini artırır",
+        "Dijital (digoksin) toksisitesi riskini artırır (potasyum düşüklüğü)",
+        "NSAİİ ilaçlar diüretik etkiyi azaltır",
+        "ACE inhibitörleri ile tansiyon aşırı düşebilir"
+      ],
+      "color": "#00ACC1",
+      "imageTargetName": "lasix_box"
+    },
+    {
+      "id": "nexium",
+      "name": "Nexium",
+      "genericName": "Esomeprazol",
+      "category": "Proton Pompası İnhibitörü (Mide Koruyucu)",
+      "icon": "🛡️",
+      "purpose": "Mide asidini azaltarak mide ve yemek borusu tahrişini önler. Nakil sonrası kullanılan ilaçların (özellikle kortikosteroidlerin) mide mukozasına zarar vermesini engeller.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle günde 1 kez, 20-40 mg alınır.",
+      "frequency": "Günde 1 kez",
+      "timing": "Sabah, kahvaltıdan 30 dakika önce (aç karnına)",
+      "howToTake": "Tableti/kapsülü bütün olarak bir bardak su ile yutun. Çiğnemeyin veya ezmeyin. Yutma güçlüğü varsa kapsülü açıp içindeki granülleri suya karıştırabilirsiniz.",
+      "warnings": [
+        "Uzun süreli kullanımda magnezyum düşüklüğü riski vardır",
+        "Kemik kırığı riski artabilir (uzun süreli kullanımda)",
+        "B12 vitamini eksikliğine yol açabilir",
+        "Klopidogrel (Plavix) ile etkileşime dikkat edin"
+      ],
+      "sideEffects": [
+        "Baş ağrısı",
+        "Karın ağrısı",
+        "Bulantı",
+        "İshal veya kabızlık",
+        "Şişkinlik ve gaz"
+      ],
+      "interactions": [
+        "Klopidogrel etkisini azaltabilir",
+        "Ketokonazol ve itrakonazol emilimini azaltır",
+        "Metotreksat düzeyini artırabilir",
+        "Takrolimus düzeyini artırabilir — izlem gerekir"
+      ],
+      "color": "#6A1B9A",
+      "imageTargetName": "nexium_box"
+    },
+    {
+      "id": "bactrim",
+      "name": "Bactrim",
+      "genericName": "Trimetoprim-Sülfametoksazol (TMP-SMX)",
+      "category": "Antibiyotik (Profilaktik)",
+      "icon": "🦠",
+      "purpose": "Nakil sonrası bağışıklık sistemi baskılandığı için Pneumocystis jirovecii pnömonisi (PCP) ve idrar yolu enfeksiyonlarını önlemek amacıyla profilaktik olarak kullanılır.",
+      "dosage": "Doktorunuzun belirlediği dozda kullanın. Genellikle haftada 3 gün veya her gün düşük dozda alınır.",
+      "frequency": "Haftada 3 gün veya her gün (doktorunuzun önerisine göre)",
+      "timing": "Sabah veya akşam, yemeklerle birlikte (tok karnına)",
+      "howToTake": "Tableti bol su ile yutun. Gün boyunca yeterli sıvı alın — böbrek taşı oluşumunu önler. Süspansiyon kullanıyorsanız iyice çalkalayın.",
+      "warnings": [
+        "Sülfonamid alerjisi varsa kullanılmamalıdır",
+        "Döküntü veya ateş olursa ilacı bırakıp hemen doktora başvurun",
+        "Böbrek fonksiyonları izlenmelidir",
+        "Güneşe karşı hassasiyet artabilir — güneş kremi kullanın",
+        "Potasyum düzeyini artırabilir"
+      ],
+      "sideEffects": [
+        "Bulantı ve kusma",
+        "Cilt döküntüsü",
+        "İshal",
+        "Güneş hassasiyeti",
+        "Kan hücresi düşüklüğü (nadir ama ciddi)"
+      ],
+      "interactions": [
+        "Warfarin etkisini artırabilir — kanama riski",
+        "Metotreksat toksisitesini artırabilir",
+        "ACE inhibitörleri ile potasyum yükselebilir",
+        "Fenitoin düzeyini artırabilir"
+      ],
+      "color": "#C62828",
+      "imageTargetName": "bactrim_box"
     }
   ]
 }

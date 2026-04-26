@@ -20,7 +20,11 @@ export default {
       adaptiveIcon: {
         backgroundColor: '#0D1B2A',
       },
-      permissions: ['android.permission.CAMERA'],
+      permissions: [
+        'android.permission.CAMERA',
+        'android.permission.RECEIVE_BOOT_COMPLETED',
+        'android.permission.SCHEDULE_EXACT_ALARM',
+      ],
     },
     plugins: [
       [
@@ -28,6 +32,14 @@ export default {
         {
           cameraPermission:
             'AR özelliklerini kullanmak için kamera erişimi gereklidir.',
+        },
+      ],
+      [
+        'expo-notifications',
+        {
+          icon: './assets/notification-icon.png',
+          color: '#1976D2',
+          sounds: [],
         },
       ],
       'expo-secure-store',

@@ -4,6 +4,8 @@ import React, {createContext, useContext, useReducer, ReactNode} from 'react';
 export interface MedicationEntry {
   id: string;
   name: string;
+  genericName: string;
+  category: string;
   dose: string;
   time: string; // "08:00"
   taken: boolean;
@@ -30,6 +32,7 @@ export interface BagItem {
 // ─── Actions ────────────────────────────────────────────────────────────────
 type Action =
   | {type: 'SET_PATIENT'; payload: Partial<PatientState>}
+  | {type: 'SET_MEDICATIONS'; payload: MedicationEntry[]}
   | {type: 'MARK_MEDICATION_TAKEN'; payload: string}
   | {type: 'ADD_WATER'; payload: number}
   | {type: 'RESET_WATER'}
@@ -38,11 +41,26 @@ type Action =
   | {type: 'REMOVE_BAG_ITEM'; payload: string};
 
 // ─── Initial State ───────────────────────────────────────────────────────────
+// Karaciğer nakli hastaları için varsayılan ilaç listesi
+const defaultMedications: MedicationEntry[] = [
+  {id: 'prograf', name: 'Prograf', genericName: 'Takrolimus', category: 'İmmün Baskılayıcı', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'prograf-2', name: 'Prograf', genericName: 'Takrolimus', category: 'İmmün Baskılayıcı', dose: 'Doktor dozunda', time: '20:00', taken: false},
+  {id: 'cellcept', name: 'CellCept', genericName: 'Mikofenolat Mofetil', category: 'İmmün Baskılayıcı', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'cellcept-2', name: 'CellCept', genericName: 'Mikofenolat Mofetil', category: 'İmmün Baskılayıcı', dose: 'Doktor dozunda', time: '20:00', taken: false},
+  {id: 'medrol', name: 'Medrol', genericName: 'Metilprednizolon', category: 'Kortikosteroid', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'ursofalk', name: 'Ursofalk', genericName: 'Ursodeoksikolik Asit', category: 'Safra Düzenleyici', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'duphalac', name: 'Duphalac', genericName: 'Laktuloz', category: 'Laksatif', dose: '15–30 ml', time: '08:00', taken: false},
+  {id: 'aldactone', name: 'Aldactone', genericName: 'Spironolakton', category: 'Diüretik', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'lasix', name: 'Lasix', genericName: 'Furosemid', category: 'Diüretik', dose: 'Doktor dozunda', time: '08:00', taken: false},
+  {id: 'nexium', name: 'Nexium', genericName: 'Esomeprazol', category: 'Mide Koruyucu', dose: 'Doktor dozunda', time: '07:30', taken: false},
+  {id: 'bactrim', name: 'Bactrim', genericName: 'TMP-SMX', category: 'Antibiyotik', dose: 'Doktor dozunda', time: '08:00', taken: false},
+];
+
 const initialState: PatientState = {
   name: '',
-  surgeryType: '',
+  surgeryType: 'Karaciğer Nakli',
   surgeryDate: '',
-  medications: [],
+  medications: defaultMedications,
   waterIntakeMl: 0,
   waterGoalMl: 2500,
   bagChecklist: [],
@@ -54,6 +72,9 @@ function patientReducer(state: PatientState, action: Action): PatientState {
   switch (action.type) {
     case 'SET_PATIENT':
       return {...state, ...action.payload};
+
+    case 'SET_MEDICATIONS':
+      return {...state, medications: action.payload};
 
     case 'MARK_MEDICATION_TAKEN':
       return {
