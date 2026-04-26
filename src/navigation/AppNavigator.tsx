@@ -57,6 +57,11 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="MedicineDetail"
           component={MedicineDetailScreen}
+          options={{
+            presentation: 'transparentModal',
+            cardStyle: { backgroundColor: 'transparent' },
+            animationEnabled: true,
+          }}
         />
         <Stack.Screen
           name="WaterTracker"

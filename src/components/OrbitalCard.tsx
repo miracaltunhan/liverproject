@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import {Colors, Radius, Shadow, Spacing, Typography} from '../theme';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 const CENTER_X = SCREEN_WIDTH / 2;
-const CENTER_Y = 250; // 3D Canvas'ın tahmini merkezi
+// Üst bar ve güvenli alan (inset) paylarını kabaca düşerek tam ortayı buluyoruz
+const CENTER_Y = SCREEN_HEIGHT / 2 - 80; 
 
 interface OrbitalCardProps {
   icon: string;

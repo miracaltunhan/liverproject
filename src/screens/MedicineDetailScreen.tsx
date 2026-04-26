@@ -136,7 +136,7 @@ export default function MedicineDetailScreen() {
   ];
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} pointerEvents="box-none">
       {/* ── Üst Bar ───────────────────────────────────────────────────────── */}
       <View style={[styles.topBar, {paddingTop: insets.top}]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
@@ -149,10 +149,10 @@ export default function MedicineDetailScreen() {
       </View>
 
       {/* ── 3D View & Orbital Kartlar ───────────────────────────────────── */}
-      <Animated.View style={[styles.content, {opacity: fadeAnim}]}>
+      <Animated.View style={[styles.content, {opacity: fadeAnim}]} pointerEvents="box-none">
         {/* Merkezde 3D Model */}
-        <View style={StyleSheet.absoluteFillObject}>
-          <Medicine3DViewer color={medicine.color} category={medicine.category} />
+        <View style={StyleSheet.absoluteFillObject} pointerEvents="auto">
+          <Medicine3DViewer color={medicine.color} category={medicine.category} medicineId={medicine.id} />
         </View>
 
         {/* Etrafta Orbital Kartlar (Açılar: 0, 60, 120, 180, 240, 300) */}
@@ -183,7 +183,7 @@ export default function MedicineDetailScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0A1118', // Koyu uzay grisi, 3D için ideal arka plan
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Arka plan kamerayı gösterecek şekilde yarı saydam
   },
   topBar: {
     flexDirection: 'row',

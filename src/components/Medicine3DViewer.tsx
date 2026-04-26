@@ -1,54 +1,45 @@
-import React, {useRef, useEffect} from 'react';
-import {Animated} from 'react-native';
-import {Canvas, useFrame} from '@react-three/fiber/native';
-import {Environment} from '@react-three/drei/native';
+import React, {useRef, useEffect, useMemo, Suspense} from 'react';
+import {Animated, ActivityIndicator, View} from 'react-native';
+import {Canvas} from '@react-three/fiber/native';
+import {OrbitControls, useGLTF} from '@react-three/drei/native';
 import * as THREE from 'three';
 
-// ── 3D Model Bileşeni ───────────────────────────────────────────────────────
-const MedicineModel = ({
-  color,
-  type,
-}: {
-  color: string;
-  type: 'capsule' | 'tablet' | 'bottle';
-}) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+// Modelleri statik olarak require etmeliyiz ki Metro Bundler paketleyebilsin
+// Yeşil kutulu model kullanılacak
+const MODEL_FILES = [
+  require('../../assets/models/medicine_box.glb'),
+];
 
-  // Sürekli yavaşça döndür
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.5;
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-    }
-  });
+// ── Yüklenen .glb Modelini Render Eden Bileşen ──────────────────────────────
+const LoadedModel = ({modelIndex, color}: {modelIndex: number; color: string}) => {
+  const modelFile = MODEL_FILES[modelIndex % MODEL_FILES.length];
+  
+  // Modeli yükle
+  const {scene} = useGLTF(modelFile as any);
+  
+  // Modelin orijinal boyutunu hesapla
+  const {autoScale, center} = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = box.getSize(new THREE.Vector3());
+    const centerVec = box.getCenter(new THREE.Vector3());
+    
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 5 / maxDim; // Ekrana sığacak ideal boyut (örn: 5 birim)
+    
+    return {autoScale: scale, center: centerVec};
+  }, [scene]);
 
-  // Materyal: Parlak (Glossy) ve hafif transparan (gerçekçi görünüm için)
-  const material = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(color),
-    roughness: 0.2,
-    metalness: 0.1,
-    clearcoat: 0.5,
-    clearcoatRoughness: 0.1,
-  });
+  const clonedScene = useMemo(() => scene.clone(true), [scene]);
 
   return (
-    <mesh ref={meshRef}>
-      {type === 'capsule' && <capsuleGeometry args={[0.6, 1.2, 32, 32]} />}
-      {type === 'tablet' && <cylinderGeometry args={[0.8, 0.8, 0.3, 32]} />}
-      {type === 'bottle' && (
-        <group>
-          <mesh position={[0, -0.2, 0]}>
-            <cylinderGeometry args={[0.6, 0.6, 1.6, 32]} />
-            <meshPhysicalMaterial color={new THREE.Color(color).multiplyScalar(0.5)} roughness={0.2} metalness={0.1} clearcoat={0.5} />
-          </mesh>
-          <mesh position={[0, 0.8, 0]}>
-            <cylinderGeometry args={[0.3, 0.3, 0.4, 32]} />
-            <meshPhysicalMaterial color="white" roughness={0.1} clearcoat={0.5} />
-          </mesh>
-        </group>
-      )}
-      {type !== 'bottle' && <primitive object={material} attach="material" />}
-    </mesh>
+    // Dışarıdaki grup modeli küçültür (Scale)
+    <group scale={autoScale}>
+      {/* İçerideki obje kendini eksi merkez kadar kaydırır (Böylece tam orijine oturur) */}
+      <primitive 
+        object={clonedScene} 
+        position={[-center.x, -center.y, -center.z]} 
+      />
+    </group>
   );
 };
 
@@ -56,10 +47,20 @@ const MedicineModel = ({
 interface Props {
   color: string;
   category: string;
+  medicineId: string; // Hangi ilaca hangi modelin geleceğini id'den rastgele(hash) seçeceğiz
 }
 
-export const Medicine3DViewer: React.FC<Props> = ({color, category}) => {
+export const Medicine3DViewer: React.FC<Props> = ({color, medicineId}) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
+
+  // İlacın IDsine göre sabit bir rastgele model seç (böylece hep aynı ilaca aynı kutu gelir)
+  const modelIndex = useMemo(() => {
+    let hash = 0;
+    for (let i = 0; i < medicineId.length; i++) {
+      hash = medicineId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % MODEL_FILES.length;
+  }, [medicineId]);
 
   // Çıkış animasyonu (Bounce)
   useEffect(() => {
@@ -72,22 +73,27 @@ export const Medicine3DViewer: React.FC<Props> = ({color, category}) => {
     }).start();
   }, [scaleAnim]);
 
-  // İlaca göre tip belirle
-  let type: 'capsule' | 'tablet' | 'bottle' = 'capsule';
-  if (category.toLowerCase().includes('laksatif')) type = 'bottle';
-  else if (category.toLowerCase().includes('diüretik')) type = 'tablet';
-  else if (category.toLowerCase().includes('kortikosteroid')) type = 'tablet';
-
   return (
     <Animated.View style={{flex: 1, transform: [{scale: scaleAnim}]}}>
-      <Canvas camera={{position: [0, 0, 4], fov: 45}}>
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
-        <directionalLight position={[-5, -5, 5]} intensity={0.5} />
+      <Canvas camera={{position: [0, 0, 16], fov: 45}}>
+        <ambientLight intensity={1.5} />
+        <directionalLight position={[10, 10, 10]} intensity={2} />
+        <directionalLight position={[-10, -10, 10]} intensity={1} />
         
-        <MedicineModel color={color} type={type} />
-        
-        {/* React Native'de Environment bazen yavaş çalışabilir, şimdilik basit ışık yeterli */}
+        {/* Etkileşimli Kamera Kontrolü: Parmağınla döndürebilirsin! */}
+        <OrbitControls 
+          enablePan={false} 
+          enableZoom={true} 
+          minDistance={5} 
+          maxDistance={30}
+          autoRotate={true}
+          autoRotateSpeed={1.5}
+        />
+
+        {/* GLB Modelini Asenkron Yükleme */}
+        <Suspense fallback={null}>
+          <LoadedModel modelIndex={modelIndex} color={color} />
+        </Suspense>
       </Canvas>
     </Animated.View>
   );
