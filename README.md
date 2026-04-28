@@ -16,11 +16,16 @@ Hasta, ameliyat öncesi yapması gerekenleri hatırlamak veya doğru uygulamak i
 - Kamera ile ilaç kutusuna yöneltince AR animasyonu tetiklenir
 - Hapın nasıl alınacağı, dozu ve saati 3D arayüzde gösterilir
 - Yanlış ilaç tespit edilirse kırmızı uyarı çerçevesi belirir
+- İlaç detay ekranında hatırlatıcı kurma desteği
 
-### 💧 2. Su Tüketimi Takibi
-- AR su şişesi objesi odada görünür
-- Günlük içilen su miktarı girdikçe şişe gerçek zamanlı dolar
-- Hedef tamamlandığında konfeti animasyonu oynatılır
+### 💧 2. Su Tüketimi Takibi *(feature/water-tracker — tamamlandı)*
+- AR su şişesi objesi (3D GLB model) gerçek ortama yerleştirilir
+- Hızlı miktar butonları (200 ml, 300 ml, 500 ml) ve özel giriş desteği
+- Şişe doldurma animasyonu (dökme + sıçrama efekti)
+- Hedef tamamlandığında konfeti animasyonu
+- **Şişe Tarayıcı (BottleScanner):** Kamera ile fotoğraf çekip Gemini AI ile şişe kapasitesi ve doluluk seviyesi otomatik analiz edilir
+- Periyodik su hatırlatma bildirimleri (expo-notifications) — ayarlanabilir aralık
+- Bildirim ayarları AsyncStorage ile kalıcı olarak saklanır
 
 ### 🥗 3. Beslenme Rehberi
 - Masa yüzeyine 3D yiyecek modelleri yerleştirilir
@@ -34,47 +39,95 @@ Hasta, ameliyat öncesi yapması gerekenleri hatırlamak veya doğru uygulamak i
 - Eksik veya unutulan eşyalar **kırmızı** yanıp söner
 - Liste kişiselleştirilebilir (isteğe göre eşya ekle/çıkar)
 
+### 👤 5. Hasta Profili
+- Ad, yaş, ameliyat tarihi ve kişisel bilgiler
+- Su hedefi ve ilaç listesi profil üzerinden yönetilir
+
 ---
 
 ## 🛠️ Teknoloji Stack
 
 | Katman | Teknoloji |
 |---|---|
-| Mobil Platform | iOS (ARKit) / Android (ARCore) |
-| Cross-platform Framework | Expo (React Native) + Viro Community |
-| 3D Modeller | GLTF / GLB formatı, Blender ile hazırlanmış |
-| Backend (opsiyonel) | Firebase Realtime Database |
-| UI/UX | Figma prototip → uygulama içi AR overlay |
+| Mobil Platform | iOS / Android |
+| Cross-platform Framework | Expo SDK 54 (React Native) |
+| Navigasyon | React Navigation v6 (Stack) |
+| AR / 3D | @viro-community/react-viro, Three.js (@react-three/fiber, @react-three/drei) |
+| 3D Modeller | GLB formatı (`bottle.glb`, `water.glb`) |
+| Yapay Zeka | Google Gemini 2.0 Flash (şişe görüntü analizi) |
+| Bildirimler | expo-notifications |
+| Yerel Depolama | @react-native-async-storage/async-storage |
+| Durum Yönetimi | React Context API (PatientContext) |
+| Animasyon | react-native-reanimated, Lottie |
+| ML (Nesne Tanıma) | TensorFlow.js + COCO-SSD |
+| Güvenli Depolama | expo-secure-store |
 
 ---
 
 ## 📁 Proje Yapısı
 
 ```
-ameliyat-oncesi-ar/
+liverproject/
 ├── assets/
-│   ├── models/           # 3D GLTF modeller (ilaç, şişe, yiyecekler, eşyalar)
-│   ├── animations/       # AR animasyon dosyaları
-│   └── icons/            # UI ikonları
+│   ├── models/               # 3D GLB modeller (bottle.glb, water.glb)
+│   ├── animations/           # Lottie animasyon dosyaları
+│   └── markers/              # AR marker görselleri
 ├── src/
 │   ├── ar/
-│   │   ├── MedicineAR.js         # İlaç kutusu AR modülü
-│   │   ├── WaterTrackerAR.js     # Su takip AR modülü
-│   │   ├── NutritionAR.js        # Beslenme rehberi AR modülü
-│   │   └── BagChecklistAR.js     # Hastane çantası AR modülü
-│   ├── components/       # Genel UI bileşenleri
-│   ├── screens/          # Ekran akışları
+│   │   ├── MedicineAR.tsx        # İlaç kutusu AR modülü
+│   │   ├── WaterTrackerAR.tsx    # Su takip AR modülü
+│   │   ├── NutritionAR.tsx       # Beslenme rehberi AR modülü
+│   │   ├── BagChecklistAR.tsx    # Hastane çantası AR modülü
+│   │   └── MockARView.tsx        # Geliştirme ortamı için mock AR
+│   ├── components/
+│   │   ├── BottleScanner.tsx     # Kamera + Gemini AI şişe analizi
+│   │   ├── AROverlay.tsx         # AR kamera overlay
+│   │   ├── ExpandedCardOverlay.tsx
+│   │   ├── FeatureCard.tsx
+│   │   ├── Header.tsx
+│   │   ├── Medicine3DViewer.tsx
+│   │   ├── MedicineInfoCard.tsx
+│   │   ├── MedicineSelectOverlay.tsx
+│   │   ├── OrbitalCard.tsx
+│   │   └── ProgressBar.tsx
+│   ├── screens/
+│   │   ├── HomeScreen.tsx
+│   │   ├── WaterTrackerScreen.tsx
+│   │   ├── MedicineScreen.tsx
+│   │   ├── MedicineDetailScreen.tsx
+│   │   ├── NutritionScreen.tsx
+│   │   ├── BagChecklistScreen.tsx
+│   │   └── PatientProfileScreen.tsx
+│   ├── services/
+│   │   ├── NotificationService.ts  # Su hatırlatma bildirimleri
+│   │   └── VisionService.ts        # Gemini AI görüntü analizi
+│   ├── store/
+│   │   └── PatientContext.tsx      # Global durum yönetimi
+│   ├── navigation/
+│   │   ├── AppNavigator.tsx
+│   │   └── types.ts
 │   ├── data/
-│   │   ├── medications.json      # İlaç bilgileri
-│   │   ├── nutrition.json        # Beslenme kısıt verileri
-│   │   └── checklist.json        # Çanta eşya listesi
-│   └── utils/            # Yardımcı fonksiyonlar
-├── ml-models/
-│   └── object_classifier.tflite  # Nesne tanıma modeli
-├── docs/
-│   └── wireframes/       # Ekran tasarımları
-├── tests/
-├── .env.example
+│   │   ├── medications.json
+│   │   ├── nutrition.json
+│   │   └── checklist.json
+│   ├── utils/
+│   │   ├── storage.ts              # AsyncStorage yardımcıları
+│   │   ├── notifications.ts
+│   │   ├── arDetect.ts
+│   │   └── dateHelpers.ts
+│   ├── mocks/
+│   │   └── react-native-fs.js
+│   └── theme/
+│       ├── colors.ts
+│       ├── typography.ts
+│       ├── spacing.ts
+│       └── index.ts
+├── app.config.js
+├── app.json
+├── App.tsx
+├── babel.config.js
+├── eas.json
+├── metro.config.js
 ├── package.json
 └── README.md
 ```
@@ -85,17 +138,16 @@ ameliyat-oncesi-ar/
 
 ### Gereksinimler
 - Node.js >= 18
-- Unity 2022.3 LTS *(Unity AR Foundation kullanılıyorsa)*
+- Expo CLI
 - Xcode 15+ *(iOS için)*
-- Android Studio + NDK *(Android için)*
-- ARKit destekli iPhone (iOS 12+) veya ARCore destekli Android cihaz
+- Android Studio *(Android için)*
 
 ### Adımlar
 
 ```bash
 # Projeyi klonla
-git clone https://github.com/kullanici/ameliyat-oncesi-ar.git
-cd ameliyat-oncesi-ar
+git clone https://github.com/miracaltunhan/liverproject.git
+cd liverproject
 
 # Bağımlılıkları yükle
 npm install
@@ -107,15 +159,26 @@ iOS cihazınızda uygulamayı test etmek için şu adımları izleyin:
 2. **Ağ Bağlantısı**: Bilgisayarınız ve iOS cihazınızın **aynı ağa** (aynı Wi-Fi veya aynı Hotspot) bağlı olduğundan emin olun.
 3. **Sunucuyu Başlatın**: Terminalde aşağıdaki komutu çalıştırın:
    ```bash
-   EXPO_OFFLINE=1 npx expo start --go
+   npx expo start --go
    ```
 4. **QR Kodu Okutun**: 
    - Terminalde çıkan QR kodunu iPhone kamerasını kullanarak taratın.
    - "Expo Go'da Aç" bildirimine tıklayın.
 
-### Android
+> **Not:** Expo Go ortamında push bildirimleri ve bazı native modüller kısıtlıdır; tam deneyim için development build kullanın.
+
+### Android (Expo Go)
 ```bash
-npx expo run:android
+npx expo start --go
+```
+
+### Development Build (Önerilen)
+```bash
+# Android
+eas build -p android --profile development
+
+# iOS
+eas build -p ios --profile development
 ```
 ```
 
@@ -127,16 +190,19 @@ npx expo run:android
 Uygulama Açılır
      │
      ▼
-Ana Menü → [ İlaç | Su | Beslenme | Çanta ]
+Ana Menü → [ İlaç | Su | Beslenme | Çanta | Profil ]
      │
      ▼
-Kamera Açılır → Yüzey Algılanır → AR İçerik Yerleştirilir
+İlgili Ekran Açılır
      │
-     ▼
-Kullanıcı Etkileşimi (dokunma / nesne tarama)
+     ├─ Su Takibi → Miktar gir / Şişe Tarayıcı ile kameradan oku
+     │               → AR şişe animasyonu → Bildirim hatırlatıcısı ayarla
      │
-     ▼
-Görev Tamamlandı → Onay Animasyonu → İlerleme Kaydedilir
+     ├─ İlaç → İlaç seç → AR 3D bilgi kartı → Hatırlatıcı kur
+     │
+     ├─ Beslenme → AR yiyecek modelleri → İzinli / Yasaklı görüntüle
+     │
+     └─ Çanta → Checklist → AR hologram eşya listesi → Tikleme
 ```
 
 ---
@@ -144,41 +210,48 @@ Görev Tamamlandı → Onay Animasyonu → İlerleme Kaydedilir
 ## 📊 Veri Akışı
 
 ```
-Hasta Profili (yaş, ameliyat türü, ilaçlar)
+Hasta Profili (ad, yaş, ameliyat tarihi, ilaçlar, su hedefi)
         │
         ▼
-Kişiselleştirilmiş İçerik Motoru
+PatientContext (React Context — global state)
         │
-   ┌────┴────┐
-   │         │
-Yerel DB   Firebase (senkron)
+   ┌────┴────────────────┐
+   │                     │
+AsyncStorage          AR Ekranları
+(kalıcı saklama)      (WaterTrackerAR, MedicineAR…)
         │
         ▼
-AR Overlay  ←  ML Modeli (nesne tanıma)
+Bildirim Servisi ← NotificationService.ts
+        │
+        ▼
+Gemini AI API ← VisionService.ts (şişe fotoğraf analizi)
 ```
 
 ---
 
 ## 🔐 Güvenlik & Gizlilik
 
-- Hasta verileri **yerel cihazda** şifreli saklanır (AES-256)
-- Kişisel sağlık verisi buluta gönderilmez (isteğe bağlı sync)
-- KVKK & GDPR uyumlu veri işleme politikası
-- Kamera erişimi yalnızca AR oturumu süresince aktiftir
+- Hasta verileri **yerel cihazda** saklanır (AsyncStorage / expo-secure-store)
+- Kişisel sağlık verisi buluta gönderilmez
+- Kamera erişimi yalnızca AR oturumu ve şişe tarama süresince aktiftir
+- KVKK uyumlu veri işleme
 
 ---
 
 ## 🗺️ Yol Haritası
 
 - [x] Proje konsepti & wireframe
-- [ ] 3D model asset pack hazırlama
-- [ ] AR Foundation temel entegrasyonu
-- [ ] İlaç kutusu modülü (MVP)
-- [ ] Su takibi modülü (MVP)
-- [ ] Beslenme modülü
-- [ ] Hastane çantası checklist
+- [x] 3D model asset'leri (bottle.glb, water.glb)
+- [x] AR mock görünümü (geliştirme ortamı)
+- [x] İlaç kutusu modülü
+- [x] Su takibi modülü (AR şişe, animasyon, bildirimler)
+- [x] Şişe Tarayıcı — Gemini AI görüntü analizi
+- [x] Beslenme rehberi modülü
+- [x] Hastane çantası checklist
+- [x] Hasta profili ekranı
+- [x] Bildirim servisi (periyodik su hatırlatıcıları)
 - [ ] Doktor panosu (uzaktan takip)
-- [ ] Çoklu dil desteği (TR / EN / DE)
+- [ ] Çoklu dil desteği (TR / EN)
 - [ ] App Store & Google Play yayını
 
 ---
@@ -186,9 +259,9 @@ AR Overlay  ←  ML Modeli (nesne tanıma)
 ## 🤝 Katkıda Bulunma
 
 1. Bu repoyu fork edin
-2. Feature branch oluşturun: `git checkout -b feature/su-takibi`
-3. Değişikliklerinizi commit edin: `git commit -m "feat: su takibi AR animasyonu eklendi"`
-4. Branch'i push edin: `git push origin feature/su-takibi`
+2. Feature branch oluşturun: `git checkout -b feature/yeni-ozellik`
+3. Değişikliklerinizi commit edin: `git commit -m "feat: açıklama"`
+4. Branch'i push edin: `git push origin feature/yeni-ozellik`
 5. Pull Request açın
 
 ---
