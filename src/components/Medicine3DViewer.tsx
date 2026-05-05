@@ -5,15 +5,16 @@ import {OrbitControls, useGLTF} from '@react-three/drei/native';
 import * as THREE from 'three';
 
 // Modelleri statik olarak require etmeliyiz ki Metro Bundler paketleyebilsin
-// Yeşil kutulu model kullanılacak
-const MODEL_FILES = [
-  require('../../assets/models/medicine_box.glb'),
-];
+const MODEL_ASSETS: Record<string, any> = {
+  tansiyon_aleti: require('../../assets/models/Stethoscope.glb'),
+  goz_bandi: require('../../assets/models/Oculus controller left.glb'),
+  pecete: require('../../assets/models/Tissue Box.glb'),
+  sarj_kablosu: require('../../assets/models/Power chord.glb'),
+  su: require('../../assets/models/water_bottle.glb'),
+};
 
 // ── Yüklenen .glb Modelini Render Eden Bileşen ──────────────────────────────
-const LoadedModel = ({modelIndex, color}: {modelIndex: number; color: string}) => {
-  const modelFile = MODEL_FILES[modelIndex % MODEL_FILES.length];
-  
+const LoadedModel = ({modelFile, color}: {modelFile: any; color: string}) => {
   // Modeli yükle
   const {scene} = useGLTF(modelFile as any);
   
@@ -24,7 +25,7 @@ const LoadedModel = ({modelIndex, color}: {modelIndex: number; color: string}) =
     const centerVec = box.getCenter(new THREE.Vector3());
     
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 5 / maxDim; // Ekrana sığacak ideal boyut (örn: 5 birim)
+    const scale = 8 / maxDim; // Daha büyük 3D görüntü
     
     return {autoScale: scale, center: centerVec};
   }, [scene]);
@@ -53,13 +54,8 @@ interface Props {
 export const Medicine3DViewer: React.FC<Props> = ({color, medicineId}) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
-  // İlacın IDsine göre sabit bir rastgele model seç (böylece hep aynı ilaca aynı kutu gelir)
-  const modelIndex = useMemo(() => {
-    let hash = 0;
-    for (let i = 0; i < medicineId.length; i++) {
-      hash = medicineId.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash) % MODEL_FILES.length;
+  const modelFile = useMemo(() => {
+    return MODEL_ASSETS[medicineId] ?? MODEL_ASSETS.tansiyon_aleti;
   }, [medicineId]);
 
   // Çıkış animasyonu (Bounce)
@@ -92,7 +88,7 @@ export const Medicine3DViewer: React.FC<Props> = ({color, medicineId}) => {
 
         {/* GLB Modelini Asenkron Yükleme */}
         <Suspense fallback={null}>
-          <LoadedModel modelIndex={modelIndex} color={color} />
+          <LoadedModel modelFile={modelFile} color={color} />
         </Suspense>
       </Canvas>
     </Animated.View>

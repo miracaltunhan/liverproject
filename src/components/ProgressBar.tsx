@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, ViewStyle} from 'react-native';
+import {View, Text, StyleSheet, ViewStyle, Animated} from 'react-native';
 import {Colors, Typography, Spacing, Radius} from '../theme';
 
 interface ProgressBarProps {
@@ -9,6 +9,7 @@ interface ProgressBarProps {
   label?: string;       // örn: "1200 / 2500 ml"
   showPercent?: boolean;
   style?: ViewStyle;
+  animatedValue?: Animated.Value; // optional animated value (0-1)
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -18,38 +19,48 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   label,
   showPercent = false,
   style,
+  animatedValue,
 }) => {
   const clamped = Math.min(Math.max(value, 0), 1);
   const percent = Math.round(clamped * 100);
 
+  // If an Animated.Value is provided, drive the fill width from it
+  const fillWidth = animatedValue
+    ? animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '100%'],
+      })
+    : `${percent}%`;
+
   return (
     <View style={[styles.wrapper, style]}>
-      {/* Üst satır: label + yüzde */}
       {(label || showPercent) && (
         <View style={styles.labelRow}>
-          {label ? (
-            <Text style={styles.label}>{label}</Text>
-          ) : (
-            <View />
-          )}
-          {showPercent && (
-            <Text style={[styles.percent, {color}]}>{percent}%</Text>
-          )}
+          {label ? <Text style={styles.label}>{label}</Text> : <View />}
+          {showPercent && <Text style={[styles.percent, {color}]}>{percent}%</Text>}
         </View>
       )}
 
-      {/* Track */}
-      <View style={[styles.track, {height}]}>
-        <View
-          style={[
-            styles.fill,
-            {
-              width: `${percent}%` as any,
-              backgroundColor: color,
-              height,
-            },
-          ]}
-        />
+      <View style={[styles.track, {height}]}> 
+        {animatedValue ? (
+          <Animated.View
+            style={[
+              styles.fill,
+              {
+                width: fillWidth as any,
+                backgroundColor: color,
+                height,
+              },
+            ]}
+          />
+        ) : (
+          <View
+            style={[
+              styles.fill,
+              {width: fillWidth as any, backgroundColor: color, height},
+            ]}
+          />
+        )}
       </View>
     </View>
   );

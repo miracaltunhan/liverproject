@@ -26,6 +26,8 @@ export interface PatientState {
 export interface BagItem {
   id: string;
   label: string;
+  description?: string; // optional açıklama
+  asset?: string; // 3D model asset adı
   packed: boolean;
   critical: boolean;
 }
@@ -57,6 +59,49 @@ const defaultMedications: MedicationEntry[] = [
   {id: 'bactrim', name: 'Bactrim', genericName: 'TMP-SMX', category: 'Antibiyotik', dose: 'Doktor dozunda', time: '08:00', taken: false},
 ];
 
+const defaultBagChecklist: BagItem[] = [
+  {
+    id: 'c1',
+    label: 'Tansiyon Aleti',
+    description: 'Kan basıncınızı düzenli olarak ölçmek için gereklidir. Ameliyat öncesi ve sonrası takip için önemlidir.',
+    asset: 'tansiyon_aleti',
+    packed: false,
+    critical: true,
+  },
+  {
+    id: 'c2',
+    label: 'Göz Bandı',
+    description: 'Gözlerinizi korumak ve rahatsız etmemek için kullanılır. Rahat bir uyku için önemlidir.',
+    asset: 'goz_bandi',
+    packed: false,
+    critical: true,
+  },
+  {
+    id: 'c3',
+    label: 'Peçete',
+    description: 'Hijyen ve temizlik için vazgeçilmez. Yüzünüzü silmek ve ellerinizi temizlemek için kullanabilirsiniz.',
+    asset: 'pecete',
+    packed: false,
+    critical: true,
+  },
+  {
+    id: 'c4',
+    label: 'Şarj Kablosu',
+    description: 'Telefonunuzun şarjı bitmesin diye yanınızda bulundurun. Hastane içinde prize erişim zor olabilir.',
+    asset: 'sarj_kablosu',
+    packed: false,
+    critical: true,
+  },
+  {
+    id: 'c5',
+    label: 'Su',
+    description: 'Susuz kalmayın. Küçük bir su şişesi hastane ortamında çok işe yarar.',
+    asset: 'su',
+    packed: false,
+    critical: true,
+  },
+];
+
 const initialState: PatientState = {
   name: '',
   surgeryType: 'Karaciğer Nakli',
@@ -64,7 +109,7 @@ const initialState: PatientState = {
   medications: defaultMedications,
   waterIntakeMl: 0,
   waterGoalMl: 2500,
-  bagChecklist: [],
+  bagChecklist: defaultBagChecklist,
   lastSyncedAt: null,
 };
 
@@ -142,7 +187,18 @@ export const PatientProvider: React.FC<{children: ReactNode}> = ({children}) => 
     loadPatientState()
       .then(saved => {
         if (saved) {
-          dispatch({type: 'SET_PATIENT', payload: saved});
+          const bagChecklist = defaultBagChecklist.map(def => {
+            const savedItem = saved.bagChecklist?.find(item => item.id === def.id);
+            return savedItem ? {...def, ...savedItem} : def;
+          });
+
+          dispatch({
+            type: 'SET_PATIENT',
+            payload: {
+              ...saved,
+              bagChecklist,
+            },
+          });
         }
       })
       .catch(() => {/* depolama erişim hatası — varsayılan state kullan */})
