@@ -6,6 +6,7 @@ import * as THREE from 'three';
 
 // Modelleri statik olarak require etmeliyiz ki Metro Bundler paketleyebilsin
 const MODEL_ASSETS: Record<string, any> = {
+  medicine_box: require('../../assets/models/medicine_box.glb'),
   tansiyon_aleti: require('../../assets/models/Stethoscope.glb'),
   goz_bandi: require('../../assets/models/Oculus controller left.glb'),
   pecete: require('../../assets/models/Tissue Box.glb'),
@@ -55,7 +56,7 @@ export const Medicine3DViewer: React.FC<Props> = ({color, medicineId}) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
   const modelFile = useMemo(() => {
-    return MODEL_ASSETS[medicineId] ?? MODEL_ASSETS.tansiyon_aleti;
+    return MODEL_ASSETS[medicineId] ?? MODEL_ASSETS.medicine_box;
   }, [medicineId]);
 
   // Çıkış animasyonu (Bounce)
